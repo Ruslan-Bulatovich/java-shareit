@@ -12,9 +12,8 @@ public class ItemMapperImpl implements ItemMapper {
         return new ItemDto(item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable(),
-                item.getOwner(),
-                item.getRequest());
+                item.getAvailable()
+        );
     }
 
     @Override
@@ -22,8 +21,6 @@ public class ItemMapperImpl implements ItemMapper {
         return new Item(itemDto.getId(),
                 itemDto.getName(),
                 itemDto.getDescription(),
-                itemDto.getAvailable(),
-                itemDto.getOwner(),
-                itemDto.getRequest());
+                itemDto.getAvailable(), null, null);
     }
 }

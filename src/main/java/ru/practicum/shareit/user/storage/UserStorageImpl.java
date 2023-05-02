@@ -66,7 +66,7 @@ public class UserStorageImpl implements UserStorage {
                 .stream()
                 .anyMatch(
                         stored -> stored.getEmail().equalsIgnoreCase(user.getEmail())
-                                && stored.getId() != user.getId()
+                                && !stored.getId().equals(user.getId())
                 )
         ) {
             throw new EmailException("Пользователь с таким адресом Эл. почты " +
