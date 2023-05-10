@@ -1,57 +1,114 @@
 package ru.practicum.shareit.item.controller;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.logger.Logger;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 @RestController
 @RequestMapping("/items")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ItemController {
-
     private final ItemService itemService;
+    private final String host = "localhost";
+    private final String port = "8080";
+    private final String protocol = "http";
     private final String userIdHeader = "X-Sharer-User-Id";
 
-    @PostMapping()
-    public ResponseEntity<ItemDto> createItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader(userIdHeader) Long userId) {
-        ItemDto itemCreated = itemService.createItem(itemDto, userId);
-        return ResponseEntity.status(201).body(itemCreated);
+    @PostMapping
+    public ResponseEntity<ItemDto> addItem(@RequestHeader(userIdHeader) long userId, @Valid @RequestBody ItemDto itemDto) {
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items")
+                .build();
+        Logger.logRequest(HttpMethod.POST, uriComponents.toUriString(), itemDto.toString());
+        return ResponseEntity.status(201).body(itemService.addItem(userId, itemDto));
     }
 
-    @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemDto> updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
-                                              @RequestHeader(userIdHeader) Long userId) {
-        ItemDto itemUpdated = itemService.updateItem(itemDto, itemId, userId);
-        return ResponseEntity.ok().body(itemUpdated);
+    @GetMapping("{itemId}")
+    public ResponseEntity<ItemDto> getItem(@PathVariable long itemId, @RequestHeader(userIdHeader) long userId) {
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items/{itemId}")
+                .build();
+        Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "пусто");
+        return ResponseEntity.ok().body(itemService.getItemById(itemId, userId));
     }
 
-    @GetMapping()
-    public ResponseEntity<List<ItemDto>> findAll(@RequestHeader(userIdHeader) Long userId) {
-        List<ItemDto> items = itemService.getAllItemsByUserId(userId);
-        return ResponseEntity.ok().body(items);
+    @GetMapping     // Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой
+    public ResponseEntity<List<ItemDto>> getAllItems(@RequestHeader(userIdHeader) long userId) {
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items")
+                .build();
+        Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "пусто");
+        return ResponseEntity.ok().body(itemService.getAllItems(userId));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Collection<ItemDto>> searchItems(@RequestParam(name = "text") String text) {
-        return ResponseEntity.ok().body(itemService.searchItemsByDescription(text));
+    public ResponseEntity<List<ItemDto>> searchItems(@RequestParam String text) {
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items/")
+                .query("search?text={text}")
+                .build();
+        Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "пусто");
+        return ResponseEntity.ok().body(itemService.searchItems(text));
     }
 
-    @DeleteMapping("/{itemId}")
-    public ResponseEntity<Void> removeItem(@PathVariable Long itemId) {
-        itemService.removeItem(itemId);
+    @PatchMapping("{itemId}")
+    public ResponseEntity<ItemDto> updateItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId, @RequestBody ItemDto itemDto) {
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items/{itemId}")
+                .build();
+        Logger.logRequest(HttpMethod.PATCH, uriComponents.toUriString(), itemDto.toString());
+        return ResponseEntity.ok().body(itemService.updateItem(userId, itemId, itemDto));
+    }
+
+    @DeleteMapping("{itemId}")
+    public ResponseEntity<Void> removeItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId) {
+        itemService.removeItem(userId, itemId);
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items/{itemId}")
+                .build();
+        Logger.logRequest(HttpMethod.DELETE, uriComponents.toUriString(), "пусто");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getItem(@PathVariable Long itemId) {
-        ItemDto item = itemService.getItem(itemId);
-        return ResponseEntity.ok().body(item);
+    @PostMapping("/{itemId}/comment")
+    public ResponseEntity<CommentDto> addComment(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId,
+                                 @RequestBody @Valid CommentDto commentDto) {
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items/{itemId}/comment")
+                .build();
+        Logger.logRequest(HttpMethod.POST, uriComponents.toUriString(), commentDto.toString());
+        return ResponseEntity.ok().body(itemService.addComment(userId, itemId, commentDto));
     }
 }
