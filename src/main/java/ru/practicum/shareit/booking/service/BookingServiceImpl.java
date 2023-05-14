@@ -10,7 +10,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
-import ru.practicum.shareit.booking.model.*;
+import ru.practicum.shareit.booking.model.AccessLevel;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.State;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.InvalidDataException;
@@ -245,6 +248,7 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidDataException("Даты бронирования выбраны некорректно.");
         }
     }
+
     private void checkDates(BookingInputDto bookingDto) {
         if (bookingDto.getStart().isAfter(bookingDto.getEnd()) ||
                 bookingDto.getStart().isEqual(bookingDto.getEnd())) {

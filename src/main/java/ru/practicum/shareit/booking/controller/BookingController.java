@@ -6,9 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-import ru.practicum.shareit.booking.model.AccessLevel;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
+import ru.practicum.shareit.booking.model.AccessLevel;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.logger.Logger;
@@ -41,7 +41,7 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")   // Подтверждение или отклонение запроса на бронирование.
     public ResponseEntity<BookingDto> approveOrRejectBooking(@PathVariable long bookingId, @RequestParam boolean approved,
-                                      @RequestHeader(userIdHeader) long userId) {
+                                                             @RequestHeader(userIdHeader) long userId) {
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme(protocol)
                 .host(host)
@@ -67,7 +67,7 @@ public class BookingController {
 
     @GetMapping   // Получение списка всех бронирований текущего пользователя (можно делать выборку по статусу).
     public ResponseEntity<List<BookingDto>> getBookingsOfCurrentUser(@RequestParam(defaultValue = "ALL") String state,
-                                              @RequestHeader(userIdHeader) long userId) {
+                                                                     @RequestHeader(userIdHeader) long userId) {
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme(protocol)
                 .host(host)
@@ -82,7 +82,7 @@ public class BookingController {
     // Получение списка бронирований для всех вещей текущего пользователя-владельца (можно делать выборку по статусу)
     @GetMapping("/owner")
     public ResponseEntity<List<BookingDto>> getBookingsOfOwner(@RequestParam(defaultValue = "ALL") String state,
-                                        @RequestHeader(userIdHeader) long userId) {
+                                                               @RequestHeader(userIdHeader) long userId) {
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme(protocol)
                 .host(host)

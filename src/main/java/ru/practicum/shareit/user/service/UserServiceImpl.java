@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public  UserDto updateUser(long id, UserDto userDto) {
+    public UserDto updateUser(long id, UserDto userDto) {
         User user = userMapper.convertFromDto(userDto);
         try {
             User targetUser = getUserById(id);

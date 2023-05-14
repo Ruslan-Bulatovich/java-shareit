@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
@@ -26,7 +27,6 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.logger.Logger;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -147,13 +147,13 @@ public class ItemServiceImpl implements ItemService {
         List<ItemDto> itemsDto = items.stream()
                 .map(itemMapper::convertToDto)
                 .collect(Collectors.toList());
-        Logger.logInfo(HttpMethod.GET, "/items",  items.toString());
+        Logger.logInfo(HttpMethod.GET, "/items", items.toString());
         List<Booking> bookings = bookingRepository.findAllByOwnerId(userId,
                 Sort.by(Sort.Direction.DESC, "start"));
         List<BookingDtoShort> bookingDtoShorts = bookings.stream()
                 .map(bookingMapper::convertToDtoShort)
                 .collect(Collectors.toList());
-        Logger.logInfo(HttpMethod.GET, "/items",  bookings.toString());
+        Logger.logInfo(HttpMethod.GET, "/items", bookings.toString());
         List<Comment> comments = commentRepository.findAllByItemIdIn(
                 items.stream()
                         .map(Item::getId)
@@ -221,7 +221,7 @@ public class ItemServiceImpl implements ItemService {
                 String.format("Вещь с id %s не найдена", itemId)));
         List<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStatus(itemId, userId, Status.APPROVED,
                 Sort.by(Sort.Direction.DESC, "start")).orElseThrow(() -> new ObjectNotFoundException(
-                                String.format("Пользователь с id %d не арендовал вещь с id %d.", userId, itemId)));
+                String.format("Пользователь с id %d не арендовал вещь с id %d.", userId, itemId)));
         Logger.logInfo(HttpMethod.POST, "/items/" + itemId + "/comment", bookings.toString());
         bookings.stream().filter(booking -> booking.getEnd().isBefore(LocalDateTime.now())).findAny().orElseThrow(() ->
                 new ObjectNotAvailableException(String.format("Пользователь с id %d не может оставлять комментарии вещи " +

@@ -101,7 +101,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<CommentDto> addComment(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId,
-                                 @RequestBody @Valid CommentDto commentDto) {
+                                                 @RequestBody @Valid CommentDto commentDto) {
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme(protocol)
                 .host(host)

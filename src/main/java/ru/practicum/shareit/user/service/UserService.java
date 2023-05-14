@@ -10,6 +10,7 @@ public interface UserService {
 
     /**
      * Реализует добавление Пользователя в хранилище
+     *
      * @param userDto объект Пользователь
      * @return UserDto
      */
@@ -17,7 +18,8 @@ public interface UserService {
 
     /**
      * Реализует обновление полей Пользователя
-     * @param userId идентификатор Пользователя
+     *
+     * @param userId  идентификатор Пользователя
      * @param userDto объект Пользователь с изменениями
      * @return UserDto
      */
@@ -25,6 +27,7 @@ public interface UserService {
 
     /**
      * Возвращает Пользователя по идентификатору
+     *
      * @param userId идентификатор пользователя
      * @return User
      */
@@ -32,6 +35,7 @@ public interface UserService {
 
     /**
      * Возвращает Пользователя по идентификатору
+     *
      * @param userId идентификатор пользователя
      * @return UserDto
      */
@@ -39,12 +43,14 @@ public interface UserService {
 
     /**
      * Возвращает коллекцию Пользователей
+     *
      * @return коллекцию UserDto
      */
     List<UserDto> getAllUsers() throws DataExistException;
 
     /**
      * Реализует удаление Пользователя из хранилища
+     *
      * @param userId идентификатор Пользователя
      */
     void removeUser(long userId);

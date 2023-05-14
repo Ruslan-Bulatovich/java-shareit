@@ -11,7 +11,8 @@ import java.util.List;
 public interface BookingService {
     /**
      * Реализует бронирование
-     * @param bookerId идентификатор
+     *
+     * @param bookerId        идентификатор
      * @param bookingInputDto Бронь
      * @return BookingDto
      */
@@ -19,9 +20,10 @@ public interface BookingService {
 
     /**
      * Реализует подтверждение или отклонение запроса на бронирование
-     * @param ownerId идентификатор Владельца
-     * @param bookingId идентификатор Брони
-     * @param approved статус бронирования
+     *
+     * @param ownerId     идентификатор Владельца
+     * @param bookingId   идентификатор Брони
+     * @param approved    статус бронирования
      * @param accessLevel уровень доступа
      * @return BookingDto
      */
@@ -29,8 +31,9 @@ public interface BookingService {
 
     /**
      * Возвращает Бронирование по идентификатору
-     * @param bookingId идентификатор Брони
-     * @param userId идентификатор пользователя
+     *
+     * @param bookingId   идентификатор Брони
+     * @param userId      идентификатор пользователя
      * @param accessLevel уровень доступа
      * @return Booking
      */
@@ -38,8 +41,9 @@ public interface BookingService {
 
     /**
      * Возвращает Бронирование по идентификатору
-     * @param bookingId идентификатор Брони
-     * @param userId идентификатор пользователя
+     *
+     * @param bookingId   идентификатор Брони
+     * @param userId      идентификатор пользователя
      * @param accessLevel уровень доступа
      * @return BookingDto
      */
@@ -47,7 +51,8 @@ public interface BookingService {
 
     /**
      * Возвращает коллекцию Booking для текущего Пользователя
-     * @param state состояние
+     *
+     * @param state    состояние
      * @param bookerId идентификатор
      * @return коллекцию BookingDto
      */
@@ -55,7 +60,8 @@ public interface BookingService {
 
     /**
      * Возвращает коллекцию Booking для текущего Владельца
-     * @param state состояние
+     *
+     * @param state   состояние
      * @param ownerId идентификатор Владельца
      * @return коллекцию BookingDto
      */
