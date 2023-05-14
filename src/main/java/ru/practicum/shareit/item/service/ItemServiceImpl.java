@@ -12,6 +12,7 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exception.InvalidDataException;
 import ru.practicum.shareit.exception.ObjectNotAvailableException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -49,18 +50,30 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemDto addItem(long userId, ItemDto itemDto) {
-        Item item = itemMapper.convertFromDto(itemDto);
-        User user = userService.getUserById(userId);
-        item.setUserId(user.getId());
-        Item itemSaved = itemRepository.save(item);
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items")
-                .build();
-        Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), itemSaved.toString());
-        return itemMapper.convertToDto(itemSaved);
+        if (userId == 0l) {
+            throw new InvalidDataException("Owner ID не может быть null");
+        }
+
+        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
+            throw new InvalidDataException("Название не может быть пустой");
+        } else if (itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
+            throw new InvalidDataException("Описание не может быть пустой");
+        } else if (itemDto.getAvailable() == null) {
+            throw new InvalidDataException("Статус не может быть пустой");
+        } else {
+            User user = userService.getUserById(userId);
+            Item item = itemMapper.convertFromDto(itemDto);
+            item.setUserId(user.getId());
+            Item itemSaved = itemRepository.save(item);
+            UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                    .scheme(protocol)
+                    .host(host)
+                    .port(port)
+                    .path("/items")
+                    .build();
+            Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), itemSaved.toString());
+            return itemMapper.convertToDto(itemSaved);
+        }
     }
 
     @Transactional

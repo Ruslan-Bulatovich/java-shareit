@@ -40,6 +40,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto addBooking(long bookerId, BookingInputDto bookingInputDto) {
+        //checkDates(bookingInputDto);
         Booking booking = bookingMapper.convertFromDto(bookingInputDto);
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme(protocol)
@@ -215,7 +216,7 @@ public class BookingServiceImpl implements BookingService {
 
     private boolean isNotValidDate(LocalDateTime startBooking, LocalDateTime endBooking) {
         return startBooking.isBefore(LocalDateTime.now()) || endBooking.isBefore(LocalDateTime.now())
-                || endBooking.isBefore(startBooking);
+                || endBooking.isBefore(startBooking) || endBooking.isEqual(startBooking);
     }
 
     private boolean isUnableToAccess(long userId, Booking booking, AccessLevel accessLevel) {
@@ -242,6 +243,12 @@ public class BookingServiceImpl implements BookingService {
                     item.getId()));
         } else if (isNotValidDate(booking.getStart(), booking.getEnd())) {
             throw new InvalidDataException("Даты бронирования выбраны некорректно.");
+        }
+    }
+    private void checkDates(BookingInputDto bookingDto) {
+        if (bookingDto.getStart().isAfter(bookingDto.getEnd()) ||
+                bookingDto.getStart().isEqual(bookingDto.getEnd())) {
+            throw new InvalidDataException("Ошибка со временем бронирования");
         }
     }
 }
