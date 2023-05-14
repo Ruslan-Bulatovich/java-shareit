@@ -30,6 +30,7 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -242,15 +243,20 @@ public class ItemServiceImpl implements ItemService {
 
     private void setBookings(ItemDto itemDto, List<BookingDtoShort> bookings) {
         itemDto.setLastBooking(bookings.stream()
-                .filter(booking -> booking.getItem().getId() == itemDto.getId() &&
-                        booking.getEnd().isBefore(LocalDateTime.now()))
-                .reduce((a, b) -> a).orElse(null));
+                .filter(b -> (b.getItem().getId() == itemDto.getId()) && !b.getStart().isAfter(LocalDateTime.now()))
+                .sorted(Comparator.comparing(BookingDtoShort::getStart).reversed())
+                .findFirst()
+                .orElse(null));
         itemDto.setNextBooking(bookings.stream()
-                .filter(booking -> booking.getItem().getId() == itemDto.getId() &&
-                        booking.getStart().isAfter(LocalDateTime.now()))
-                .findFirst().orElse(null));
+                .filter(b -> (b.getItem().getId() == itemDto.getId()) && b.getStart().isAfter(LocalDateTime.now()))
+                .reduce((a, b) -> a.getStart().isBefore(b.getStart()) ? a : b)
+                .orElse(null));
     }
 
+    /*        itemDto.setNextBooking(bookings.stream()
+                .filter(b -> (b.getItem().getId() == itemDto.getId()) && b.getStart().isAfter(LocalDateTime.now()))
+                .reduce((a, b) -> a.getStart().isBefore(b.getStart()) ? a : b)
+                .orElse(null));*/
     private void setComments(ItemDto itemDto, List<Comment> comments) {
         itemDto.setComments(comments.stream()
                 .filter(comment -> comment.getItem().getId() == itemDto.getId())
