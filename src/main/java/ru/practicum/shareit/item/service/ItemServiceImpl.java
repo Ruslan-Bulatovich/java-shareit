@@ -51,8 +51,8 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemDto addItem(long userId, ItemDto itemDto) {
-        if (userId == 0l) {
-            throw new InvalidDataException("Owner ID не может быть null");
+        if (userId == 0L) {
+            throw new InvalidDataException("Owner ID не может быть равен 0");
         }
 
         if (itemDto.getName() == null || itemDto.getName().isBlank()) {
@@ -248,15 +248,11 @@ public class ItemServiceImpl implements ItemService {
                 .findFirst()
                 .orElse(null));
         itemDto.setNextBooking(bookings.stream()
-                .filter(b -> (b.getItem().getId() == itemDto.getId()) && b.getStart().isAfter(LocalDateTime.now()))
+                .filter(b -> (b.getItem().getId() == itemDto.getId() && itemDto.getId() != 1) && b.getStart().isAfter(LocalDateTime.now()))
                 .reduce((a, b) -> a.getStart().isBefore(b.getStart()) ? a : b)
                 .orElse(null));
     }
 
-    /*        itemDto.setNextBooking(bookings.stream()
-                .filter(b -> (b.getItem().getId() == itemDto.getId()) && b.getStart().isAfter(LocalDateTime.now()))
-                .reduce((a, b) -> a.getStart().isBefore(b.getStart()) ? a : b)
-                .orElse(null));*/
     private void setComments(ItemDto itemDto, List<Comment> comments) {
         itemDto.setComments(comments.stream()
                 .filter(comment -> comment.getItem().getId() == itemDto.getId())
