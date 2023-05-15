@@ -21,6 +21,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -37,6 +38,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final BookingRepository bookingRepository;
     private final ItemMapper itemMapper;
+    private final UserMapper userMapper;
     private final BookingMapper bookingMapper;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
@@ -56,7 +58,7 @@ public class ItemServiceImpl implements ItemService {
         } else if (itemDto.getAvailable() == null) {
             throw new InvalidDataException("Статус не может быть пустой");
         } else {
-            User user = userService.getUserById(userId);
+            User user = userMapper.convertFromDto(userService.getUser(userId));
             Item item = itemMapper.convertFromDto(itemDto);
             item.setUserId(user.getId());
             Item itemSaved = itemRepository.save(item);
@@ -68,7 +70,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         Item item = itemMapper.convertFromDto(itemDto);
-        User user = userService.getUserById(userId);
+        User user = userMapper.convertFromDto(userService.getUser(userId));
         Item targetItem = itemRepository.findById(itemId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", itemId)));
         if (targetItem.getUserId() != user.getId()) {
@@ -92,7 +94,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     @Override
     public ItemDto getItemById(long itemId, long userId) {
-        userService.getUserById(userId);
+        userService.getUser(userId);
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", itemId)));
         ItemDto itemDto = itemMapper.convertToDto(item);
@@ -116,7 +118,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     @Override
     public List<ItemDto> getAllItems(long userId) {
-        User user = userService.getUserById(userId);
+        User user = userMapper.convertFromDto(userService.getUser(userId));
         List<Item> items = itemRepository.findAllByUserIdOrderById(user.getId());
         List<ItemDto> itemsDto = items.stream()
                 .map(itemMapper::convertToDto)
@@ -156,7 +158,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public void removeItem(long userId, long itemId) {
-        userService.getUserById(userId);
+        userService.getUser(userId);
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", itemId)));
         itemRepository.deleteById(item.getId());
@@ -166,7 +168,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentDto addComment(long userId, long itemId, CommentDto commentDto) {
         Comment comment = commentMapper.convertFromDto(commentDto);
-        User user = userService.getUserById(userId);
+        User user = userMapper.convertFromDto(userService.getUser(userId));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ObjectNotFoundException(
                 String.format("Вещь с id %s не найдена", itemId)));
         List<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStatus(itemId, userId, Status.APPROVED,

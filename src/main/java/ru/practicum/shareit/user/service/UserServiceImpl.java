@@ -18,9 +18,6 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
-    private final String host = "localhost";
-    private final String port = "8080";
-    private final String protocol = "http";
 
     @Transactional
     @Override
@@ -35,7 +32,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(long id, UserDto userDto) {
         User user = userMapper.convertFromDto(userDto);
-        User targetUser = getUserById(id);
+        User targetUser = userMapper.convertFromDto(getUser(id));
         if (StringUtils.hasLength(user.getEmail())) {
             targetUser.setEmail(user.getEmail());
         }
@@ -46,13 +43,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.convertToDto(userSaved);
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    public User getUserById(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
-        return user;
-    }
 
     @Transactional(readOnly = true)
     @Override

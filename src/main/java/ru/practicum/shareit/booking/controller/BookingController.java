@@ -17,9 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 public class BookingController {
     private final BookingService bookingService;
-    private final String host = "localhost";
-    private final String port = "8080";
-    private final String protocol = "http";
     private final String userIdHeader = "X-Sharer-User-Id";
 
     @PostMapping()

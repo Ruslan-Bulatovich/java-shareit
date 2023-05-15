@@ -28,7 +28,7 @@ public class ItemController {
         return ResponseEntity.ok().body(itemService.getItemById(itemId, userId));
     }
 
-    @GetMapping()  // Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой
+    @GetMapping()
     public ResponseEntity<List<ItemDto>> getAllItems(@RequestHeader(userIdHeader) long userId) {
         return ResponseEntity.ok().body(itemService.getAllItems(userId));
     }

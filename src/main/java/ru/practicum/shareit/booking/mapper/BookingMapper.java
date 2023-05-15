@@ -14,9 +14,12 @@ public interface BookingMapper {
 
     BookingDto convertToDto(Booking booking);
 
+    Booking convertFromInputDto(BookingDto bookingDto);
+
     @Mapping(target = "bookerId", source = "booker.id")
     BookingDtoShort convertToDtoShort(Booking booking);
 
     @Mapping(target = "item.id", source = "itemId")
-    Booking convertFromDto(BookingInputDto bookingInputDto);
+    Booking convertFromInputDto(BookingInputDto bookingInputDto);
+
 }
