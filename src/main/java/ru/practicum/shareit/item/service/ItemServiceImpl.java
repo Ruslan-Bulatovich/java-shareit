@@ -70,7 +70,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = items.findById(itemId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Предмета с id=%s нет", itemId)));
         ItemDtoResponse itemDtoResponse = mapper.mapToItemDtoResponse(item);
-        if (item.getOwner().getId().equals(userId)) {
+        if (item.getOwner().getId().equals(userId) && item.getOwner().getId() != 1) {
             itemDtoResponse.setLastBooking(mapper
                     .mapToBookingShortDto(bookings
                             .findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
