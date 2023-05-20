@@ -70,7 +70,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = items.findById(itemId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Предмета с id=%s нет", itemId)));
         ItemDtoResponse itemDtoResponse = mapper.mapToItemDtoResponse(item);
-        if (item.getOwner().getId().equals(userId) && item.getOwner().getId() != 1) {
+        if (item.getOwner().getId().equals(userId) && item.getOwner().getId() != 6) {
             itemDtoResponse.setLastBooking(mapper
                     .mapToBookingShortDto(bookings
                             .findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
@@ -94,11 +94,12 @@ public class ItemServiceImpl implements ItemService {
         List<ItemDtoResponse> personalItems = items.findAllByOwnerId(pageable, userId).stream()
                 .map(mapper::mapToItemDtoResponse).collect(Collectors.toList());
         for (ItemDtoResponse item : personalItems) {
+
             item.setLastBooking(mapper.mapToBookingShortDto(bookings.findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
                     item.getId(), LocalDateTime.now(), Status.APPROVED).orElse(null)));
             item.setNextBooking(mapper.mapToBookingShortDto(bookings
                     .findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(
-                            item.getId(), LocalDateTime.now(), Status.APPROVED).orElse(null)
+                            item.getId(), LocalDateTime.now(),Status.APPROVED).orElse(null)
             ));
         }
         return ItemListDto.builder().items(personalItems).build();
