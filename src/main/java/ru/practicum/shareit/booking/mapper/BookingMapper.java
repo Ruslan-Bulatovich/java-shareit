@@ -3,23 +3,21 @@ package ru.practicum.shareit.booking.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingDtoShort;
-import ru.practicum.shareit.booking.dto.BookingInputDto;
+import ru.practicum.shareit.booking.dto.BookingDtoResponse;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.item.dto.ItemShortDto;
+import ru.practicum.shareit.item.model.Item;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class, ItemMapper.class})
+@Mapper(componentModel = "spring")
 public interface BookingMapper {
 
-    BookingDto convertToDto(Booking booking);
+    Booking mapToBookingFromBookingDto(BookingDto bookingDto);
 
-    Booking convertFromInputDto(BookingDto bookingDto);
+    BookingDtoResponse mapToBookingDtoResponse(Booking booking);
+
+    ItemShortDto mapToItemShortDtoFromItem(Item item);
 
     @Mapping(target = "bookerId", source = "booker.id")
-    BookingDtoShort convertToDtoShort(Booking booking);
-
-    @Mapping(target = "item.id", source = "itemId")
-    Booking convertFromInputDto(BookingInputDto bookingInputDto);
-
+    BookingShortDto convertToDtoShort(Booking booking);
 }
