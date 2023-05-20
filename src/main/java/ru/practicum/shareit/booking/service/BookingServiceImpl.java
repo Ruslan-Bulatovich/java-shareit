@@ -36,10 +36,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDtoResponse createBooking(Long bookerId, BookingDto bookingDto) {
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
+        if (isNotValidDate(bookingDto.getStart(),bookingDto.getEnd())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Дата окончания бронирования не может быть раньше даты начала");
         }
+        //isNotValidDate(bookingDto.getStart(),bookingDto.getEnd());
         Item item = items.findById(bookingDto.getItemId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("Предмета с id=%s нет", bookingDto.getItemId())));
@@ -49,6 +50,7 @@ public class BookingServiceImpl implements BookingService {
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 String.format("Пользователя с id=%s нет", bookerId)));
                 Booking booking = mapper.mapToBookingFromBookingDto(bookingDto);
+
                 booking.setItem(item);
                 booking.setBooker(user);
                 return mapper.mapToBookingDtoResponse(bookings.save(booking));
@@ -218,5 +220,9 @@ public class BookingServiceImpl implements BookingService {
             default:
                 throw new StateException("Unknown state: " + state);
         }
+    }
+    private boolean isNotValidDate(LocalDateTime startBooking, LocalDateTime endBooking) {
+        return startBooking.isBefore(LocalDateTime.now()) || endBooking.isBefore(LocalDateTime.now())
+                || endBooking.isBefore(startBooking) || endBooking.isEqual(startBooking);
     }
 }
