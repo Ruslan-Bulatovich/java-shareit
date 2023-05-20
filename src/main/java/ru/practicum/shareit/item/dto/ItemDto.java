@@ -1,10 +1,13 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -21,5 +24,16 @@ public class ItemDto {
     private Boolean available;
     private BookingDtoShort lastBooking;
     private BookingDtoShort nextBooking;
-    private List<CommentDto> comments;
+    private List<CommentData> comments;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CommentData {
+        private long id;
+        private String text;
+        private String authorName;
+        private LocalDateTime created;
+    }
+
 }

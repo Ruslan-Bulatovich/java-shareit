@@ -108,8 +108,8 @@ public class ItemServiceImpl implements ItemService {
         }
         List<Comment> comments = commentRepository.findAllByItemId(itemId,
                 Sort.by(Sort.Direction.DESC, "created"));
-        List<CommentDto> commentsDto = comments.stream()
-                .map(commentMapper::convertToDto)
+        List<ItemDto.CommentData> commentsDto = comments.stream()
+                .map(commentMapper::convertToData)
                 .collect(Collectors.toList());
         itemDto.setComments(commentsDto);
         return itemDto;
@@ -199,7 +199,7 @@ public class ItemServiceImpl implements ItemService {
     private void setComments(ItemDto itemDto, List<Comment> comments) {
         itemDto.setComments(comments.stream()
                 .filter(comment -> comment.getItem().getId() == itemDto.getId())
-                .map(commentMapper::convertToDto)
+                .map(commentMapper::convertToData)
                 .collect(Collectors.toList()));
     }
 }
