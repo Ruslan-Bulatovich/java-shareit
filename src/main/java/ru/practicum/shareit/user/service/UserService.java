@@ -1,18 +1,47 @@
 package ru.practicum.shareit.user.service;
 
 import ru.practicum.shareit.user.dto.UserDto;
-
-import java.util.List;
+import ru.practicum.shareit.user.dto.UserDtoResponse;
+import ru.practicum.shareit.user.dto.UserDtoUpdate;
+import ru.practicum.shareit.user.dto.UserListDto;
 
 public interface UserService {
+    /**
+     * Добавление Пользователя
+     *
+     * @param userDto объект Пользователь
+     * @return UserDtoResponse
+     */
+    UserDtoResponse createUser(UserDto userDto);
 
-    UserDto addUser(UserDto userDto);
+    /**
+     * Возвращает Пользователя по идентификатору
+     *
+     * @param userId идентификатор пользователя
+     * @return UserDtoResponse
+     */
+    UserDtoResponse getUserById(Long userId);
 
-    UserDto updateUser(long userId, UserDto userDto);
+    /**
+     * Возвращает коллекцию Пользователей
+     *
+     * @return коллекцию UserListDto
+     */
+    UserListDto getUsers();
 
-    UserDto getUser(long userId);
+    /**
+     * Обновление полей Пользователя
+     *
+     * @param userId  идентификатор Пользователя
+     * @param userDto объект Пользователь с изменениями
+     * @return UserDtoResponse
+     */
+    UserDtoResponse updateUser(UserDtoUpdate userDto, Long userId);
 
-    List<UserDto> getAllUsers();
-
-    void removeUser(long userId);
+    /**
+     * Удаление Пользователя
+     *
+     * @param userId идентификатор Пользователя
+     */
+    void deleteUser(Long userId);
 }

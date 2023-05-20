@@ -1,42 +1,25 @@
 package ru.practicum.shareit.booking.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.booking.enums.Status;
 
+import javax.validation.constraints.Future;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class BookingDto {
-    private long id;
-    private ItemData item;
-    private UserData booker;
-    private Status status;
+    @NotNull(message = "Поле start обязательно")
+    @Future(message = "Начало бронирования не может быть в прошлом")
     private LocalDateTime start;
+    @Future(message = "Конец бронирования не может быть в прошлом")
+    @NotNull(message = "Поле end обязательно")
     private LocalDateTime end;
-
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UserData {
-        private long id;
-        private String email;
-        private String name;
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ItemData {
-        private long id;
-        private long userId;
-        private String name;
-        private String description;
-        private Boolean available;
-    }
-
+    @NotNull(message = "Поле itemId обязательо")
+    @Min(value = 1, message = "Некорректный itemId")
+    private Long itemId;
+    private final Status status = Status.WAITING;
 }

@@ -1,43 +1,46 @@
 package ru.practicum.shareit.booking.repository;
 
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.Status;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findAllByBookerId(long bookerId, Sort sort);
+    List<Booking> findAllByBookerIdOrderByStartDesc(Pageable pageable, Long bookerId);
 
-    List<Booking> findAllByBookerIdAndStatus(long bookerId, Status status, Sort sort);
+    List<Booking> findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
+            Pageable pageable, Long bookerId, LocalDateTime start, LocalDateTime end);
 
-    List<Booking> findAllByBookerIdAndStartAfter(long bookerId, LocalDateTime localDateTime, Sort sort);
+    List<Booking> findAllByBookerIdAndEndIsBeforeOrderByStartDesc(Pageable pageable, Long bookerId, LocalDateTime end);
 
-    List<Booking> findAllByBookerIdAndEndBefore(long bookerId, LocalDateTime localDateTime, Sort sort);
+    List<Booking> findAllByBookerIdAndStartIsAfterOrderByStartDesc(
+            Pageable pageable, Long bookerId, LocalDateTime start);
 
-    @Query(value = "select b from Booking b where b.booker.id = ?1 and b.start < ?2 and b.end > ?2")
-    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfter(long bookerId, LocalDateTime localDateTime, Sort sort);
+    List<Booking> findAllByBookerIdAndStatusIsOrderByStartDesc(Pageable pageable, Long bookerId, Status status);
 
-    @Query(value = "select b from Booking b where b.item.userId = ?1")
-    List<Booking> findAllByOwnerId(long ownerId, Sort sort);
+    List<Booking> findAllByItemIdInOrderByStartDesc(Pageable pageable, Collection<Long> itemId);
 
-    @Query(value = "select b from Booking b where b.item.userId = ?1 and b.status = ?2")
-    List<Booking> findAllByOwnerIdAndStatus(long ownerId, Status status, Sort sort);
+    List<Booking> findAllByItemIdInAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
+            Pageable pageable, Collection<Long> itemId, LocalDateTime start, LocalDateTime end);
 
-    @Query(value = "select b from Booking b where b.item.userId = ?1 and b.start > ?2")
-    List<Booking> findAllByOwnerIdAndStartAfter(long ownerId, LocalDateTime localDateTime, Sort sort);
+    List<Booking> findAllByItemIdInAndEndIsBeforeOrderByStartDesc(
+            Pageable pageable, Collection<Long> itemId, LocalDateTime end);
 
-    @Query(value = "select b from Booking b where b.item.userId = ?1 and b.end < ?2")
-    List<Booking> findAllByOwnerIdAndEndBefore(long ownerId, LocalDateTime localDateTime, Sort sort);
+    List<Booking> findAllByItemIdInAndStartIsAfterOrderByStartDesc(
+            Pageable pageable, Collection<Long> itemId, LocalDateTime start);
 
-    @Query(value = "select b from Booking b where b.item.userId = ?1 and b.start < ?2 and b.end > ?2")
-    List<Booking> findAllByOwnerIdAndStartBeforeAndEndAfter(long bookerId, LocalDateTime localDateTime, Sort sort);
+    List<Booking> findAllByItemIdInAndStatusIsOrderByStartDesc(
+            Pageable pageable, Collection<Long> itemId, Status status);
 
-    List<Booking> findByItemId(long itemId, Sort sort);
+    Optional<Booking> findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(Long itemId, LocalDateTime end, Status status); // постман требует от меня null
 
-    Optional<List<Booking>> findAllByItemIdAndBookerIdAndStatus(long itemId, long bookerId, Status status, Sort sort);
+    Optional<Booking> findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(Long itemId, LocalDateTime start, Status status);
+
+    Boolean existsBookingByItemIdAndBookerIdAndStatusAndEndIsBefore(
+            Long itemId, Long bookerId, Status status, LocalDateTime end);
 }

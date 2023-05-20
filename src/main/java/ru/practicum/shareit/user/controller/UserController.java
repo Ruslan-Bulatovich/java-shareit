@@ -1,46 +1,52 @@
 package ru.practicum.shareit.user.controller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exception.DataExistException;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserDtoResponse;
+import ru.practicum.shareit.user.dto.UserDtoUpdate;
+import ru.practicum.shareit.user.dto.UserListDto;
 
 import javax.validation.Valid;
-import java.util.List;
+import javax.validation.constraints.Min;
+
 
 @RestController
-@RequestMapping(path = "/users")
-@AllArgsConstructor
+@RequestMapping("/users")
+@Validated
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserController {
-
     private final UserService userService;
 
-    @PostMapping()
-    public ResponseEntity<UserDto> addUser(@Valid @RequestBody UserDto userDto) throws DataExistException {
-        return ResponseEntity.status(201).body(userService.addUser(userDto));
+    @PostMapping
+    public ResponseEntity<UserDtoResponse> createUser(@Valid @RequestBody UserDto userDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userDto));
     }
 
-    @GetMapping("{userId}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable long userId) {
-        return ResponseEntity.ok().body(userService.getUser(userId));
+    @GetMapping("{id}")
+    public ResponseEntity<UserDtoResponse> getUserById(@PathVariable("id") @Min(1) Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(userId));
     }
 
-    @GetMapping()
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok().body(userService.getAllUsers());
+    @GetMapping
+    public ResponseEntity<UserListDto> getUsers() {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUsers());
     }
 
-    @PatchMapping("{userId}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable long userId, @RequestBody UserDto userDto) {
-        return ResponseEntity.ok().body(userService.updateUser(userId, userDto));
+    @PatchMapping("{id}")
+    public ResponseEntity<UserDtoResponse> updateUser(@RequestBody UserDtoUpdate userDtoUpdate,
+                                                      @PathVariable("id") Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userDtoUpdate, userId));
     }
 
-    @DeleteMapping("{userId}")
-    public ResponseEntity<Void> removeUser(@PathVariable long userId) {
-        userService.removeUser(userId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @DeleteMapping("{id}")
+    public void deleteUser(@Min(1) @PathVariable("id") Long userId) {
+        userService.deleteUser(userId);
     }
+
 }
