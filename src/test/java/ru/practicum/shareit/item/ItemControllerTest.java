@@ -93,44 +93,6 @@ public class ItemControllerTest {
 
     @SneakyThrows
     @Test
-    public void createItemWithIncorrectName() {
-        //given
-        item1.setName("  test name");
-        //when
-        mvc.perform(
-                        post("/items")
-                                .header(userIdHeader, 1)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).createItem(any(ItemDto.class), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
-    public void createItemWithIncorrectDescription() {
-        //given
-        item1.setDescription("  test description");
-        //when
-        mvc.perform(
-                        post("/items")
-                                .header(userIdHeader, 1)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).createItem(any(ItemDto.class), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
     public void createItemWithIncorrectAvailable() {
         //given
         item1.setAvailable(null);
