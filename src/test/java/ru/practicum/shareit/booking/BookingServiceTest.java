@@ -83,6 +83,7 @@ public class BookingServiceTest extends Bookings {
         assertThat(savedBooking).usingRecursiveComparison().ignoringFields("start", "end")
                 .isEqualTo(findBooking);
     }
+
     @Test
     public void createBookingWithNotExistingItem() {
         booking1Dto.setItemId(2L);
@@ -93,6 +94,7 @@ public class BookingServiceTest extends Bookings {
                 () -> bookingService.createBooking(user2.getId(), booking1Dto)
         ).isInstanceOf(ResponseStatusException.class);
     }
+
     @Test
     public void createBookingWhenEndBeforeStart() {
         //given
