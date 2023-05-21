@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.repository;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.model.Booking;
@@ -39,8 +40,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Optional<Booking> findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(Long itemId, LocalDateTime end, Status status); // постман требует от меня null
 
+    Optional<Booking> findFirstByItemIdAndEndBeforeAndStatusOrderByStartDesc(Long itemId, LocalDateTime start, Status status);
+
     Optional<Booking> findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(Long itemId, LocalDateTime start, Status status);
 
     Boolean existsBookingByItemIdAndBookerIdAndStatusAndEndIsBefore(
             Long itemId, Long bookerId, Status status, LocalDateTime end);
+
+    List<Booking> findByItemId(long itemId, Sort sort);
 }

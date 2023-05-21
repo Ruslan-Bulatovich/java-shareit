@@ -81,15 +81,15 @@ CREATE TABLE IF NOT EXISTS bookings
     start_date
               TIMESTAMP
                   WITHOUT
-                  TIME
-                  ZONE
+                      TIME
+                      ZONE
         NOT
             NULL,
     end_date
               TIMESTAMP
                   WITHOUT
-                  TIME
-                  ZONE
+                      TIME
+                      ZONE
         NOT
             NULL,
     item_id
@@ -104,13 +104,10 @@ CREATE TABLE IF NOT EXISTS bookings
          user_id
             )
         ON DELETE RESTRICT,
-    status    enum
-                  (
-                      'WAITING',
-                      'APPROVED',
-                      'REJECTED',
-                      'CANCELED'
-                      )
+    status    enum('WAITING',
+                  'APPROVED',
+                  'REJECTED',
+                  'CANCELED')
 );
 
 CREATE TABLE IF NOT EXISTS comments

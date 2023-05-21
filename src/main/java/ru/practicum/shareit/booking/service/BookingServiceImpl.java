@@ -40,7 +40,6 @@ public class BookingServiceImpl implements BookingService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Дата окончания бронирования не может быть раньше даты начала");
         }
-        //isNotValidDate(bookingDto.getStart(),bookingDto.getEnd());
         Item item = items.findById(bookingDto.getItemId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("Предмета с id=%s нет", bookingDto.getItemId())));
@@ -50,7 +49,6 @@ public class BookingServiceImpl implements BookingService {
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 String.format("Пользователя с id=%s нет", bookerId)));
                 Booking booking = mapper.mapToBookingFromBookingDto(bookingDto);
-
                 booking.setItem(item);
                 booking.setBooker(user);
                 return mapper.mapToBookingDtoResponse(bookings.save(booking));
