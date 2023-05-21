@@ -40,7 +40,9 @@ public class BookingControllerTest {
     private final BookingService bookingService;
     private static BookingDto bookingDto;
     private static ItemShortDto itemShortDto;
+    private static BookingDtoResponse.ItemData itemData;
     private static UserShortDto userShortDto;
+    private static BookingDtoResponse.UserData userData;
     private BookingListDto bookingListDto;
     private static BookingDtoResponse bookingDtoResponse;
     private final String userIdHeader = "X-Sharer-User-Id";
@@ -64,8 +66,8 @@ public class BookingControllerTest {
                 .id(1L)
                 .start(bookingDto.getStart())
                 .end(bookingDto.getEnd())
-                .item(itemShortDto)
-                .booker(userShortDto)
+                .item(itemData)
+                .booker(userData)
                 .status(bookingDto.getStatus())
                 .build();
     }
