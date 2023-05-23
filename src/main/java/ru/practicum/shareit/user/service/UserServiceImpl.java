@@ -2,11 +2,10 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.error.handler.exception.ObjectNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoResponse;
 import ru.practicum.shareit.user.dto.UserDtoUpdate;
@@ -32,7 +31,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtoResponse getUserById(Long id) {
         return mapper.mapToUserDtoResponse(users.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", id)))
+                () -> new ObjectNotFoundException(String.format("Пользователя с id=%s нет", id)))
         );
     }
 
@@ -47,14 +46,14 @@ public class UserServiceImpl implements UserService {
     @Transactional(propagation = Propagation.SUPPORTS)
     public UserDtoResponse updateUser(UserDtoUpdate user, Long userId) {
         User updatingUser = users.findById(userId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", userId)));
+                () -> new ObjectNotFoundException(String.format("Пользователя с id=%s нет", userId)));
         return mapper.mapToUserDtoResponse(users.save(mapper.mapToUserFromUserDtoUpdate(user, updatingUser)));
     }
 
     @Override
     public void deleteUser(Long id) {
         if (!users.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", id));
+            throw new ObjectNotFoundException(String.format("Пользователя с id=%s нет", id));
         }
         users.deleteById(id);
     }

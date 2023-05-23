@@ -3,9 +3,8 @@ package ru.practicum.shareit.request.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.error.handler.exception.ObjectNotFoundException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
 import ru.practicum.shareit.request.dto.ItemRequestListDto;
@@ -28,7 +27,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestDtoResponse createItemRequest(ItemRequestDto itemRequestDto, Long requesterId) {
         User user = users.findById(requesterId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", requesterId)));
+                () -> new ObjectNotFoundException(String.format("Пользователя с id=%s нет", requesterId)));
         ItemRequest newRequest = mapper.mapToItemRequest(itemRequestDto);
         newRequest.setRequester(user);
         newRequest.setCreated(LocalDateTime.now());
@@ -38,7 +37,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestListDto getPrivateRequests(PageRequest pageRequest, Long requesterId) {
         if (!users.existsById(requesterId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", requesterId));
+            throw new ObjectNotFoundException(String.format("Пользователя с id=%s нет", requesterId));
         }
         return ItemRequestListDto.builder()
                 .requests(mapper.mapToRequestDtoResponseWithMD(requests.findAllByRequesterId(pageRequest, requesterId)
@@ -48,7 +47,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestListDto getOtherRequests(PageRequest pageRequest, Long requesterId) {
         if (!users.existsById(requesterId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", requesterId));
+            throw new ObjectNotFoundException(String.format("Пользователя с id=%s нет", requesterId));
         }
         return ItemRequestListDto.builder()
                 .requests(mapper.mapToRequestDtoResponseWithMD(requests.findAllByRequesterIdNot(pageRequest, requesterId)
@@ -58,13 +57,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public RequestDtoResponseWithMD getItemRequest(Long userId, Long requestId) {
         if (!users.existsById(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", userId));
+            throw new ObjectNotFoundException(String.format("Пользователя с id=%s нет", userId));
         }
         return mapper.mapToRequestDtoResponseWithMD(
                 requests.findById(requestId)
                         .orElseThrow(
-                                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                        String.format("Запроса с id=%s нет", requestId)
+                                () -> new ObjectNotFoundException(String.format("Запроса с id=%s нет", requestId)
                                 )
                         ));
     }

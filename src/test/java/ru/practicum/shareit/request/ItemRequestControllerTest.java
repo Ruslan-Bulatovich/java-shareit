@@ -289,7 +289,6 @@ public class ItemRequestControllerTest {
                                 .header(userIdHeader, 0)
                 ).andDo(print())
                 .andExpectAll(
-                        //then
                         status().isBadRequest()
                 );
         verify(itemRequestService, times(0)).getItemRequest(anyLong(), anyLong());

@@ -10,13 +10,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.error.handler.exception.InvalidDataException;
+import ru.practicum.shareit.error.handler.exception.ObjectNotAvailableException;
+import ru.practicum.shareit.error.handler.exception.ObjectNotFoundException;
 import ru.practicum.shareit.error.handler.exception.StateException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -102,7 +104,7 @@ public class BookingServiceTest {
         itemRepository.save(item1);
         assertThatThrownBy(
                 () -> bookingService.createBooking(user2.getId(), booking1Dto)
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -115,7 +117,7 @@ public class BookingServiceTest {
         itemRepository.save(item1);
         assertThatThrownBy(
                 () -> bookingService.createBooking(user2.getId(), booking1Dto)
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(InvalidDataException.class);
     }
 
     @Test
@@ -125,7 +127,7 @@ public class BookingServiceTest {
         itemRepository.save(item1);
         assertThatThrownBy(
                 () -> bookingService.createBooking(user1.getId(), booking1Dto)
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -135,7 +137,7 @@ public class BookingServiceTest {
         itemRepository.save(item1);
         assertThatThrownBy(
                 () -> bookingService.createBooking(99L, booking1Dto)
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -146,7 +148,7 @@ public class BookingServiceTest {
         itemRepository.save(item1);
         assertThatThrownBy(
                 () -> bookingService.createBooking(user2.getId(), booking1Dto)
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotAvailableException.class);
     }
 
     @Test
@@ -183,7 +185,7 @@ public class BookingServiceTest {
         var savedBooking = bookingService.createBooking(user2.getId(), booking1Dto);
         assertThatThrownBy(
                 () -> bookingService.approveBooking(user1.getId(), savedBooking.getId(), "truee")
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotAvailableException.class);
     }
 
     @Test
@@ -194,7 +196,7 @@ public class BookingServiceTest {
         bookingService.createBooking(user2.getId(), booking1Dto);
         assertThatThrownBy(
                 () -> bookingService.approveBooking(user1.getId(), 99L, "true")
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -206,7 +208,7 @@ public class BookingServiceTest {
         bookingService.approveBooking(user1.getId(), savedBooking.getId(), "false");
         assertThatThrownBy(
                 () -> bookingService.approveBooking(user1.getId(), savedBooking.getId(), "true")
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotAvailableException.class);
     }
 
     @Test
@@ -217,7 +219,7 @@ public class BookingServiceTest {
         var savedBooking = bookingService.createBooking(user2.getId(), booking1Dto);
         assertThatThrownBy(
                 () -> bookingService.approveBooking(user2.getId(), savedBooking.getId(), "true")
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -228,7 +230,7 @@ public class BookingServiceTest {
         bookingService.createBooking(user2.getId(), booking1Dto);
         assertThatThrownBy(
                 () -> bookingService.getBookingByIdForOwnerAndBooker(99L, user2.getId())
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -239,7 +241,7 @@ public class BookingServiceTest {
         var savedBooking = bookingService.createBooking(user2.getId(), booking1Dto);
         assertThatThrownBy(
                 () -> bookingService.getBookingByIdForOwnerAndBooker(savedBooking.getId(), 10L)
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -252,7 +254,7 @@ public class BookingServiceTest {
         addBookingsInDb();
         var findBookingList = bookingService
                 .getAllBookingsForUser(PageRequest.of(0, 10), user2.getId(), "ALL");
-        //then
+
         assertThat(findBookingList.getBookings().size()).isEqualTo(10);
         List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).collect(Collectors.toList());
         assertThat(ids).first().isEqualTo(futureBookingForItem2.getId());
@@ -443,7 +445,6 @@ public class BookingServiceTest {
     public void getAllBookingsForItemsUserWhenStateIsRejected() {
         //given
         initializationItem2AndBookings();
-        notify();
         userRepository.save(user1);
         userRepository.save(user2);
         itemRepository.save(item1);
@@ -468,7 +469,7 @@ public class BookingServiceTest {
         userRepository.save(user1);
         assertThatThrownBy(
                 () -> bookingService.getAllBookingsForUser(PageRequest.of(0, 10), 50L, "ALL")
-        ).isInstanceOf(RuntimeException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -502,6 +503,8 @@ public class BookingServiceTest {
         currentBookingForItem1.setBooker(user2);
         currentBookingForItem1.setStatus(Status.APPROVED);
 
+        Thread.sleep(50);
+
         currentBookingForItem2 = new Booking();
         currentBookingForItem2.setStart(LocalDateTime.now().minusDays(1));
         currentBookingForItem2.setEnd(LocalDateTime.now().plusDays(1));
@@ -509,7 +512,8 @@ public class BookingServiceTest {
         currentBookingForItem2.setBooker(user2);
         currentBookingForItem2.setStatus(Status.APPROVED);
 
-        //Thread.sleep(50);
+        Thread.sleep(50);
+
         pastBookingForItem1 = new Booking();
         pastBookingForItem1.setStart(LocalDateTime.now().minusDays(2));
         pastBookingForItem1.setEnd(LocalDateTime.now().minusDays(1));
@@ -517,7 +521,8 @@ public class BookingServiceTest {
         pastBookingForItem1.setBooker(user2);
         pastBookingForItem1.setStatus(Status.APPROVED);
 
-        //Thread.sleep(50);
+        Thread.sleep(50);
+
         pastBookingForItem2 = new Booking();
         pastBookingForItem2.setStart(LocalDateTime.now().minusDays(2));
         pastBookingForItem2.setEnd(LocalDateTime.now().minusDays(1));
@@ -525,7 +530,8 @@ public class BookingServiceTest {
         pastBookingForItem2.setBooker(user2);
         pastBookingForItem2.setStatus(Status.APPROVED);
 
-        //Thread.sleep(50);
+        Thread.sleep(50);
+
         futureBookingForItem1 = new Booking();
         futureBookingForItem1.setStart(LocalDateTime.now().plusDays(1));
         futureBookingForItem1.setEnd(LocalDateTime.now().plusDays(2));
@@ -533,7 +539,8 @@ public class BookingServiceTest {
         futureBookingForItem1.setBooker(user2);
         futureBookingForItem1.setStatus(Status.APPROVED);
 
-        //Thread.sleep(50);
+        Thread.sleep(50);
+
         futureBookingForItem2 = new Booking();
         futureBookingForItem2.setStart(LocalDateTime.now().plusDays(1));
         futureBookingForItem2.setEnd(LocalDateTime.now().plusDays(2));
@@ -541,7 +548,7 @@ public class BookingServiceTest {
         futureBookingForItem2.setBooker(user2);
         futureBookingForItem2.setStatus(Status.APPROVED);
 
-        //Thread.sleep(50);
+        Thread.sleep(50);
 
         waitingBookingForItem1 = new Booking();
         waitingBookingForItem1.setStart(LocalDateTime.now().plusHours(1));
@@ -550,7 +557,7 @@ public class BookingServiceTest {
         waitingBookingForItem1.setBooker(user2);
         waitingBookingForItem1.setStatus(Status.WAITING);
 
-        //Thread.sleep(50);
+        Thread.sleep(50);
 
         waitingBookingForItem2 = new Booking();
         waitingBookingForItem2.setStart(LocalDateTime.now().plusHours(1));
@@ -559,7 +566,7 @@ public class BookingServiceTest {
         waitingBookingForItem2.setBooker(user2);
         waitingBookingForItem2.setStatus(Status.WAITING);
 
-        //Thread.sleep(50);
+        Thread.sleep(50);
 
         rejectedBookingForItem1 = new Booking();
         rejectedBookingForItem1.setStart(LocalDateTime.now().plusHours(1));
@@ -568,13 +575,14 @@ public class BookingServiceTest {
         rejectedBookingForItem1.setBooker(user2);
         rejectedBookingForItem1.setStatus(Status.REJECTED);
 
+        Thread.sleep(50);
+
         rejectedBookingForItem2 = new Booking();
         rejectedBookingForItem2.setStart(LocalDateTime.now().plusHours(1));
         rejectedBookingForItem2.setEnd(LocalDateTime.now().plusHours(2));
         rejectedBookingForItem2.setItem(item2);
         rejectedBookingForItem2.setBooker(user2);
         rejectedBookingForItem2.setStatus(Status.REJECTED);
-
     }
 
     @SneakyThrows()
