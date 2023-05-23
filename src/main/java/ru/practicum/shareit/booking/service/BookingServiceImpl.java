@@ -15,7 +15,7 @@ import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.error.handler.exception.StateException;
+import ru.practicum.shareit.error.handler.exception.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -37,27 +37,23 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingDtoResponse createBooking(Long bookerId, BookingDto bookingDto) {
         if (isNotValidDate(bookingDto.getStart(), bookingDto.getEnd())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Дата окончания бронирования не может быть раньше даты начала");
+            throw new InvalidDataException("Дата окончания бронирования не может быть раньше даты начала");
         }
         Item item = items.findById(bookingDto.getItemId()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("Предмета с id=%s нет", bookingDto.getItemId())));
+                () -> new ObjectNotFoundException(String.format("Предмета с id=%s нет", bookingDto.getItemId())));
         if (!item.getOwner().getId().equals(bookerId)) {
             if (item.getAvailable()) {
                 User user = users.findById(bookerId).orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                String.format("Пользователя с id=%s нет", bookerId)));
+                        () -> new ObjectNotFoundException(String.format("Пользователя с id=%s нет", bookerId)));
                 Booking booking = mapper.mapToBookingFromBookingDto(bookingDto);
                 booking.setItem(item);
                 booking.setBooker(user);
                 return mapper.mapToBookingDtoResponse(bookings.save(booking));
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        String.format("Вещь с id=%s недоступна для бронирования", item.getId()));
+                throw new ObjectNotAvailableException(String.format("Вещь с id=%s недоступна для бронирования", item.getId()));
             }
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Владелец не может забронировать свою вещь");
+            throw new ObjectNotFoundException("Владелец не может забронировать свою вещь");
         }
     }
 
@@ -66,14 +62,12 @@ public class BookingServiceImpl implements BookingService {
     public BookingDtoResponse approveBooking(Long ownerId, Long bookingId, String approved) {
         String approve = approved.toLowerCase();
         if (!(approve.equals("true") || approve.equals("false"))) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Неккоректный параметр строки approved");
+            throw new ObjectNotAvailableException("Неккоректный параметр строки approved");
         }
         Booking booking = bookings.findById(bookingId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("Бронирования с id=%s нет", bookingId)));
+                () -> new ObjectNotFoundException(String.format("Бронирования с id=%s нет", bookingId)));
         if (!booking.getStatus().equals(Status.WAITING)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Невозможно изменить статус брони со статусом " + booking.getStatus());
+            throw new ObjectNotAvailableException("Невозможно изменить статус брони со статусом " + booking.getStatus());
         }
         if (booking.getItem().getOwner().getId().equals(ownerId)) {
             if (approve.equals("true")) {
@@ -83,8 +77,7 @@ public class BookingServiceImpl implements BookingService {
             }
             return mapper.mapToBookingDtoResponse(bookings.save(booking));
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("Пользователь с id=%s не является владельцем вещи с id=%s", ownerId, booking.getItem().getOwner().getId()));
+            throw new ObjectNotFoundException(String.format("Пользователь с id=%s не является владельцем вещи с id=%s", ownerId, booking.getItem().getOwner().getId()));
         }
     }
 
@@ -94,8 +87,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookings.findById(bookingId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Бронирования с id=" + bookingId + " нет"));
         if (!(booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().getId().equals(userId))) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("Пользователь с id=%s не является автором бронирования или владельцем вещи, к которой относится бронирование", userId));
+            throw new ObjectNotFoundException(String.format("Пользователь с id=%s не является автором бронирования или владельцем вещи, к которой относится бронирование", userId));
         }
         return mapper.mapToBookingDtoResponse(booking);
     }
@@ -104,8 +96,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public BookingListDto getAllBookingsForUser(Pageable pageable, Long userId, String state) {
         if (!users.existsById(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("Пользователя с id=%s не существует", userId));
+            throw new ObjectNotFoundException(String.format("Пользователя с id=%s не существует", userId));
         } else {
             return getListBookings(pageable, state, userId, false);
         }
@@ -115,11 +106,10 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public BookingListDto getAllBookingsForItemsUser(Pageable pageable, Long userId, String state) {
         if (!users.existsById(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s не существует", userId));
+            throw new ObjectNotFoundException(String.format("Пользователя с id=%s не существует", userId));
         }
         if (!items.existsItemByOwnerId(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("У пользователя с id=%s нет зарегестрированых вещей", userId));
+            throw new ObjectNotFoundException(String.format("У пользователя с id=%s нет зарегестрированых вещей", userId));
         } else {
             return getListBookings(pageable, state, userId, true);
         }
