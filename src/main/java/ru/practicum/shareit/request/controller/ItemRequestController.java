@@ -24,7 +24,7 @@ import javax.validation.constraints.Min;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
-    private final static String userIdHeader = "X-Sharer-User-Id";
+    private static final String userIdHeader = "X-Sharer-User-Id";
 
     @PostMapping
     public ResponseEntity<ItemRequestDtoResponse> createRequest(@RequestHeader(userIdHeader) @Min(1) Long requesterId,

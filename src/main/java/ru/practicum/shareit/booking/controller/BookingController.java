@@ -23,7 +23,7 @@ import javax.validation.constraints.Min;
 public class BookingController {
 
     private final BookingService bookingService;
-    private final static String userIdHeader = "X-Sharer-User-Id";
+    private static final String userIdHeader = "X-Sharer-User-Id";
 
     @PostMapping
     public ResponseEntity<BookingDtoResponse> createBooking(@RequestHeader(userIdHeader) @Min(1) Long bookerId,
