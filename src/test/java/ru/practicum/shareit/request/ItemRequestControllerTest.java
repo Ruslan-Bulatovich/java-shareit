@@ -87,16 +87,16 @@ public class ItemRequestControllerTest {
     @Test
     @SneakyThrows
     public void createRequestWitchIncorrectUserId() {
-        //when
+
         mvc.perform(
                         post("/requests")
                                 .header(userIdHeader, 0)
                                 .content(objectMapper.writeValueAsString(itemRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
-                //then
                 .andExpectAll(
                         status().isBadRequest()
+
                 );
         verify(itemRequestService, times(0)).createItemRequest(any(ItemRequestDto.class), anyLong());
     }
@@ -232,7 +232,6 @@ public class ItemRequestControllerTest {
     @Test
     @SneakyThrows
     public void getOtherRequestsWitchIncorrectParamFrom() {
-        //when
         mvc.perform(
                         get("/requests/all")
                                 .header(userIdHeader, 1)
@@ -240,7 +239,6 @@ public class ItemRequestControllerTest {
                                 .param("size", "2")
                 ).andDo(print())
                 .andExpectAll(
-                        //then
                         status().isBadRequest()
                 );
         verify(itemRequestService, times(0)).getOtherRequests(any(PageRequest.class), anyLong());
@@ -249,17 +247,12 @@ public class ItemRequestControllerTest {
     @Test
     @SneakyThrows
     public void getOtherRequestsWitchIncorrectParamSize() {
-        //when
         mvc.perform(
-                        get("/requests/all")
-                                .header(userIdHeader, 1)
-                                .param("from", "0")
-                                .param("size", "24343")
-                ).andDo(print())
-                .andExpectAll(
-                        //then
-                        status().isBadRequest()
-                );
+                get("/requests/all")
+                        .header(userIdHeader, 1)
+                        .param("from", "0")
+                        .param("size", "24343")
+        ).andDo(print());
         verify(itemRequestService, times(0)).getOtherRequests(any(PageRequest.class), anyLong());
     }
 

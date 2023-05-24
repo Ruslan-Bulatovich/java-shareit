@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.error.handler.exception.ObjectNotFoundException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
@@ -45,51 +45,40 @@ public class ItemRequestServiceTest {
 
     @Test
     public void createItemRequest() {
-        //given
         userRepository.save(user1);
-        //when
         var savedRequest = itemRequestService.createItemRequest(itemRequestDto, user1.getId());
         var findRequest = itemRequestService.getItemRequest(user1.getId(), savedRequest.getId());
-        //then
         assertThat(savedRequest).usingRecursiveComparison().ignoringFields("items", "created")
                 .isEqualTo(findRequest);
     }
 
     @Test
     public void createItemRequestWhenRequesterNotFound() {
-        //given
         userRepository.save(user1);
         assertThatThrownBy(
-                //when
                 () -> itemRequestService.createItemRequest(itemRequestDto, 99L)
-                //then
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
     public void getPrivateRequest() {
-        //given
+
         userRepository.save(user1);
         userRepository.save(user2);
         var savedRequest = itemRequestService.createItemRequest(itemRequestDto, user2.getId());
-        //when
         var privateRequests = itemRequestService
                 .getPrivateRequests(PageRequest.of(0, 2), user2.getId());
         var findRequest = itemRequestService.getItemRequest(user2.getId(), savedRequest.getId());
-        //then
         assertThat(privateRequests.getRequests().get(0)).usingRecursiveComparison().isEqualTo(findRequest);
     }
 
     @Test
     public void getPrivateRequestWhenRequesterNotExistingRequests() {
-        //given
         userRepository.save(user1);
         assertThatThrownBy(
-                //when
                 () -> itemRequestService
                         .getPrivateRequests(PageRequest.of(0, 2), 55L)
-                //then
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -114,7 +103,7 @@ public class ItemRequestServiceTest {
                 //when
                 () -> itemRequestService.getOtherRequests(PageRequest.of(0, 2), 50L)
                 //then
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -126,7 +115,7 @@ public class ItemRequestServiceTest {
                 //when
                 () -> itemRequestService.getItemRequest(50L, savedRequest.getId())
                 //then
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
@@ -138,6 +127,6 @@ public class ItemRequestServiceTest {
                 //when
                 () -> itemRequestService.getItemRequest(savedRequest.getId(), 50L)
                 //then
-        ).isInstanceOf(ResponseStatusException.class);
+        ).isInstanceOf(ObjectNotFoundException.class);
     }
 }

@@ -1,17 +1,21 @@
 package ru.practicum.shareit.error.handler.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.shareit.error.handler.responce.StateErrorResponse;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Objects;
 
 @RestControllerAdvice
 @Slf4j
-public class ErrorHandler_forTest {
+public class ErrorHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({MethodArgumentNotValidException.class, ObjectNotAvailableException.class,
@@ -47,5 +51,26 @@ public class ErrorHandler_forTest {
     public ErrorResponse handleArgumentExceptionHandler(RuntimeException e) {
         log.warn(e.getClass().getSimpleName(), e);
         return new ErrorResponse(400, "Bad Request", e.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    private ResponseEntity<String> handleException() {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(HttpStatus.INTERNAL_SERVER_ERROR + " Нарушение уникального индекса или первичного ключа");
+    }
+
+    @ExceptionHandler(StateException.class)
+    private ResponseEntity<StateErrorResponse> handleException(StateException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new StateErrorResponse(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    private ResponseEntity<String> handleException(ConstraintViolationException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(HttpStatus.BAD_REQUEST + " " + exception.getMessage());
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.error.handler.exception.ObjectNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoUpdate;
 import ru.practicum.shareit.user.service.UserService;
@@ -44,60 +44,47 @@ public class UserServiceTest {
 
     @Test
     public void createAndGetUser() {
-        //when
         var savedUser = userService.createUser(user1);
         var findUser = userService.getUserById(1L);
-        //then
         assertThat(savedUser).usingRecursiveComparison().isEqualTo(findUser);
     }
 
     @Test
     public void createUserWithDuplicateEmail() {
-        //given
         userService.createUser(user1);
         assertThatThrownBy(
-                //when
                 () -> userService.createUser(user1))
-                //then
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
     public void getNotExistUserById() {
         assertThatThrownBy(
-                //when
                 () -> userService.getUserById(2L))
-                //then
-                .isInstanceOf(ResponseStatusException.class);
+                .isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
     public void getEmptyUsersList() {
-        //when
         var users = userService.getUsers();
-        //then
         assertThat(users.getUsers()).isEmpty();
     }
 
     @Test
     public void getUsersList() {
-        //when
         var savedUser1 = userService.createUser(user1);
         var savedUser2 = userService.createUser(user2);
         var findUsers = userService.getUsers();
-        //then
         assertThat(findUsers.getUsers()).element(0).usingRecursiveComparison().isEqualTo(savedUser1);
         assertThat(findUsers.getUsers()).element(1).usingRecursiveComparison().isEqualTo(savedUser2);
     }
 
     @Test
     public void updateUser() {
-        //given
         updateUser1 = UserDtoUpdate.builder()
                 .name("update name")
                 .email("update-email@test.ru")
                 .build();
-        //when
         userService.createUser(user1);
         userService.updateUser(updateUser1, 1L);
         var updatedUser1 = userService.getUserById(1L);
@@ -107,11 +94,9 @@ public class UserServiceTest {
 
     @Test
     public void updateUserName() {
-        //given
         updateUser1 = UserDtoUpdate.builder()
                 .email("update-email@test.ru")
                 .build();
-        //when
         userService.createUser(user1);
         userService.updateUser(updateUser1, 1L);
         var updatedUser1 = userService.getUserById(1L);
@@ -121,11 +106,9 @@ public class UserServiceTest {
 
     @Test
     public void updateUserEmail() {
-        //given
         updateUser1 = UserDtoUpdate.builder()
                 .name("update name")
                 .build();
-        //when
         userService.createUser(user1);
         userService.updateUser(updateUser1, 1L);
         var updatedUser1 = userService.getUserById(1L);
@@ -136,36 +119,28 @@ public class UserServiceTest {
     @Test
     @Transactional(propagation = Propagation.SUPPORTS)
     public void updateUserDuplicateEmail() {
-        //given
         updateUser1 = UserDtoUpdate.builder()
                 .email(user1.getEmail())
                 .build();
-        //when
         userService.createUser(user1);
         userService.createUser(user2);
         assertThatThrownBy(
                 () -> userService.updateUser(updateUser1, 2L))
-                //then
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
     public void deleteUserById() {
-        //given
         var savedUser = userService.createUser(user1);
-        //when
         userService.deleteUser(savedUser.getId());
-        //then
-        assertThatThrownBy(() -> userService.getUserById(savedUser.getId())).isInstanceOf(ResponseStatusException.class);
+        assertThatThrownBy(() -> userService.getUserById(savedUser.getId())).isInstanceOf(ObjectNotFoundException.class);
     }
 
     @Test
     public void deleteUserByNotExistId() {
         assertThatThrownBy(
-                //when
                 () -> userService.deleteUser(1L)
         )
-                //then
-                .isInstanceOf(ResponseStatusException.class);
+                .isInstanceOf(ObjectNotFoundException.class);
     }
 }
