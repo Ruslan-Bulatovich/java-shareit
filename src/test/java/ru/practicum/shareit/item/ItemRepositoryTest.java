@@ -24,7 +24,6 @@ public class ItemRepositoryTest {
     protected TestEntityManager entityManager;
     private User user1;
     private User user2;
-
     private Item item1;
     private Item item2;
 
