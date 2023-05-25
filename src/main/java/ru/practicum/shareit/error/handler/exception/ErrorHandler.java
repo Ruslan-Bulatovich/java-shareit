@@ -40,17 +40,10 @@ public class ErrorHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({ObjectNotFoundException.class, AccessException.class})
+    @ExceptionHandler({ObjectNotFoundException.class})
     public ErrorResponse handleDataExistExceptionException(RuntimeException e) {
         log.warn(e.getClass().getSimpleName(), e);
         return new ErrorResponse(404, "Not Found", e.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({ArgumentException.class})
-    public ErrorResponse handleArgumentExceptionHandler(RuntimeException e) {
-        log.warn(e.getClass().getSimpleName(), e);
-        return new ErrorResponse(400, "Bad Request", e.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
