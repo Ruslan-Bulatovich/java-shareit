@@ -93,6 +93,7 @@ public class ItemServiceTest {
     @Test
     public void notExistingUserCreateItem() {
         assertThatThrownBy(
+                //then
                 () -> itemService.createItem(item1Dto, 1L)
         )
                 .isInstanceOf(ObjectNotFoundException.class);
@@ -149,7 +150,9 @@ public class ItemServiceTest {
 
     @Test
     public void updateItemWithOtherUser() {
+        //given
         userRepository.save(user1);
+        //when
         var savedItem = itemService.createItem(item1Dto, user1.getId());
         assertThatThrownBy(
                 () -> itemService.updateItem(savedItem.getId(), 2L, item1UpdateDto)
