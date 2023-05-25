@@ -1,11 +1,13 @@
 package ru.practicum.shareit.user.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 
 @Data
+@AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
 @Table(name = "users")

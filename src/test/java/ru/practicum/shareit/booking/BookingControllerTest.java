@@ -38,13 +38,13 @@ public class BookingControllerTest {
     private final MockMvc mvc;
     @MockBean
     private final BookingService bookingService;
-    private static BookingDto bookingDto;
-    private static ItemShortDto itemShortDto;
-    private static BookingDtoResponse.ItemData itemData;
-    private static UserShortDto userShortDto;
-    private static BookingDtoResponse.UserData userData;
+    private BookingDto bookingDto;
+    private ItemShortDto itemShortDto;
+    private BookingDtoResponse.ItemData itemData;
+    private UserShortDto userShortDto;
+    private BookingDtoResponse.UserData userData;
     private BookingListDto bookingListDto;
-    private static BookingDtoResponse bookingDtoResponse;
+    private BookingDtoResponse bookingDtoResponse;
     private final String userIdHeader = "X-Sharer-User-Id";
 
     @BeforeEach
@@ -88,6 +88,7 @@ public class BookingControllerTest {
                         status().isCreated(),
                         content().json(objectMapper.writeValueAsString(bookingDtoResponse))
                 );
+        verify(bookingService, times(1)).createBooking(anyLong(), any(BookingDto.class));
     }
 
     @Test
@@ -124,7 +125,6 @@ public class BookingControllerTest {
                         status().isBadRequest()
                 );
         verify(bookingService, times(0)).createBooking(anyLong(), any(BookingDto.class));
-        bookingDto.setStart(LocalDateTime.now().plusDays(1));
     }
 
     @Test

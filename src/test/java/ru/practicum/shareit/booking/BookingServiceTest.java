@@ -494,186 +494,94 @@ public class BookingServiceTest {
     }
 
     @SneakyThrows()
-    private void initializationItem2AndBookings1() {
-        LocalDateTime time = LocalDateTime.of(2023, 5, 24, 18, 30);
-        LocalDateTime time1 = LocalDateTime.of(2023, 5, 24, 18, 30);
-
-        currentBookingForItem1 = new Booking();
-        currentBookingForItem1.setStart(time.minusDays(1));
-        currentBookingForItem1.setEnd(time.plusDays(1));
-        currentBookingForItem1.setItem(item1);
-        currentBookingForItem1.setBooker(user2);
-        currentBookingForItem1.setStatus(Status.APPROVED);
-
-        time = time.plusHours(1);
-
-        pastBookingForItem1 = new Booking();
-        pastBookingForItem1.setStart(time.minusDays(2));
-        pastBookingForItem1.setEnd(time.minusDays(1));
-        pastBookingForItem1.setItem(item1);
-        pastBookingForItem1.setBooker(user2);
-        pastBookingForItem1.setStatus(Status.APPROVED);
-
-        time = time.plusHours(1);
-
-        pastBookingForItem2 = new Booking();
-        pastBookingForItem2.setStart(time.minusDays(2));
-        pastBookingForItem2.setEnd(time.minusDays(1));
-        pastBookingForItem2.setItem(item2);
-        pastBookingForItem2.setBooker(user2);
-        pastBookingForItem2.setStatus(Status.APPROVED);
-
-        time = time.plusHours(1);
-
-        futureBookingForItem1 = new Booking();
-        futureBookingForItem1.setStart(time.plusDays(1));
-        futureBookingForItem1.setEnd(time.plusDays(2));
-        futureBookingForItem1.setItem(item1);
-        futureBookingForItem1.setBooker(user2);
-        futureBookingForItem1.setStatus(Status.APPROVED);
-
-        time = time.plusHours(1);
-
-        futureBookingForItem2 = new Booking();
-        futureBookingForItem2.setStart(time.plusDays(1));
-        futureBookingForItem2.setEnd(time.plusDays(2));
-        futureBookingForItem2.setItem(item2);
-        futureBookingForItem2.setBooker(user2);
-        futureBookingForItem2.setStatus(Status.APPROVED);
-
-        time = time.plusHours(1);
-
-        waitingBookingForItem1 = new Booking();
-        waitingBookingForItem1.setStart(time.plusHours(1));
-        waitingBookingForItem1.setEnd(time.plusHours(2));
-        waitingBookingForItem1.setItem(item1);
-        waitingBookingForItem1.setBooker(user2);
-        waitingBookingForItem1.setStatus(Status.WAITING);
-
-        time = time.plusHours(1);
-
-        waitingBookingForItem2 = new Booking();
-        waitingBookingForItem2.setStart(time.plusHours(1));
-        waitingBookingForItem2.setEnd(time.plusHours(2));
-        waitingBookingForItem2.setItem(item2);
-        waitingBookingForItem2.setBooker(user2);
-        waitingBookingForItem2.setStatus(Status.WAITING);
-
-        time = time.plusHours(1);
-
-        rejectedBookingForItem1 = new Booking();
-        rejectedBookingForItem1.setStart(time.plusHours(1));
-        rejectedBookingForItem1.setEnd(time.plusHours(2));
-        rejectedBookingForItem1.setItem(item1);
-        rejectedBookingForItem1.setBooker(user2);
-        rejectedBookingForItem1.setStatus(Status.REJECTED);
-
-        time = time.plusHours(1);
-
-        rejectedBookingForItem2 = new Booking();
-        rejectedBookingForItem2.setStart(time.plusHours(1));
-        rejectedBookingForItem2.setEnd(time.plusHours(2));
-        rejectedBookingForItem2.setItem(item2);
-        rejectedBookingForItem2.setBooker(user2);
-        rejectedBookingForItem2.setStatus(Status.REJECTED);
-    }
-
-    @SneakyThrows()
     private void initializationItem2AndBookings() {
-        // 2023-05-24T17:27:47.683+00:00
-        LocalDateTime time = LocalDateTime.of(2023, 5, 24, 18, 30);
-        LocalDateTime time1 = LocalDateTime.of(2023, 5, 24, 18, 30);
-        pastBookingForItem1 = new Booking();
-        pastBookingForItem1.setStart(time.minusDays(2));
-        pastBookingForItem1.setEnd(time.minusDays(1));
-        pastBookingForItem1.setItem(item1);
-        pastBookingForItem1.setBooker(user2);
-        pastBookingForItem1.setStatus(Status.APPROVED);
-
-        time = time.plusSeconds(10);
-
-        pastBookingForItem2 = new Booking();
-        pastBookingForItem2.setStart(time.minusDays(2));
-        pastBookingForItem2.setEnd(time.minusDays(1));
-        pastBookingForItem2.setItem(item2);
-        pastBookingForItem2.setBooker(user2);
-        pastBookingForItem2.setStatus(Status.APPROVED);
-
-        time = time.plusSeconds(10);
-
         currentBookingForItem1 = new Booking();
-        currentBookingForItem1.setStart(time.minusDays(1));
-        currentBookingForItem1.setEnd(time.plusDays(1));
+        currentBookingForItem1.setStart(LocalDateTime.now().minusDays(1));
+        currentBookingForItem1.setEnd(LocalDateTime.now().plusDays(1));
         currentBookingForItem1.setItem(item1);
         currentBookingForItem1.setBooker(user2);
         currentBookingForItem1.setStatus(Status.APPROVED);
 
-        time = time.plusSeconds(10);
+        Thread.sleep(50);
 
         currentBookingForItem2 = new Booking();
-        currentBookingForItem2.setStart(time.minusDays(1));
-        currentBookingForItem2.setEnd(time.plusDays(1));
+        currentBookingForItem2.setStart(LocalDateTime.now().minusDays(1));
+        currentBookingForItem2.setEnd(LocalDateTime.now().plusDays(1));
         currentBookingForItem2.setItem(item2);
         currentBookingForItem2.setBooker(user2);
         currentBookingForItem2.setStatus(Status.APPROVED);
 
-        time = time.plusSeconds(10);
+        Thread.sleep(50);
+
+        pastBookingForItem1 = new Booking();
+        pastBookingForItem1.setStart(LocalDateTime.now().minusDays(2));
+        pastBookingForItem1.setEnd(LocalDateTime.now().minusDays(1));
+        pastBookingForItem1.setItem(item1);
+        pastBookingForItem1.setBooker(user2);
+        pastBookingForItem1.setStatus(Status.APPROVED);
+
+        Thread.sleep(50);
+
+        pastBookingForItem2 = new Booking();
+        pastBookingForItem2.setStart(LocalDateTime.now().minusDays(2));
+        pastBookingForItem2.setEnd(LocalDateTime.now().minusDays(1));
+        pastBookingForItem2.setItem(item2);
+        pastBookingForItem2.setBooker(user2);
+        pastBookingForItem2.setStatus(Status.APPROVED);
+
+        Thread.sleep(50);
 
         futureBookingForItem1 = new Booking();
-        futureBookingForItem1.setStart(time.plusDays(1));
-        futureBookingForItem1.setEnd(time.plusDays(2));
+        futureBookingForItem1.setStart(LocalDateTime.now().plusDays(1));
+        futureBookingForItem1.setEnd(LocalDateTime.now().plusDays(2));
         futureBookingForItem1.setItem(item1);
         futureBookingForItem1.setBooker(user2);
         futureBookingForItem1.setStatus(Status.APPROVED);
-        //time = time.plusSeconds(3);
-        //Thread.sleep(50);
-        time = time.plusSeconds(10);
+
+        Thread.sleep(50);
 
         futureBookingForItem2 = new Booking();
-        futureBookingForItem2.setStart(time.plusDays(1));
-        futureBookingForItem2.setEnd(time.plusDays(2));
+        futureBookingForItem2.setStart(LocalDateTime.now().plusDays(1));
+        futureBookingForItem2.setEnd(LocalDateTime.now().plusDays(2));
         futureBookingForItem2.setItem(item2);
         futureBookingForItem2.setBooker(user2);
         futureBookingForItem2.setStatus(Status.APPROVED);
 
-        time = time.plusSeconds(10);
+        Thread.sleep(50);
 
         waitingBookingForItem1 = new Booking();
-        waitingBookingForItem1.setStart(time.plusHours(1));
-        waitingBookingForItem1.setEnd(time.plusHours(2));
+        waitingBookingForItem1.setStart(LocalDateTime.now().plusHours(1));
+        waitingBookingForItem1.setEnd(LocalDateTime.now().plusHours(2));
         waitingBookingForItem1.setItem(item1);
         waitingBookingForItem1.setBooker(user2);
         waitingBookingForItem1.setStatus(Status.WAITING);
 
-        time = time.plusSeconds(10);
+        Thread.sleep(50);
 
         waitingBookingForItem2 = new Booking();
-        waitingBookingForItem2.setStart(time.plusHours(1));
-        waitingBookingForItem2.setEnd(time.plusHours(2));
+        waitingBookingForItem2.setStart(LocalDateTime.now().plusHours(1));
+        waitingBookingForItem2.setEnd(LocalDateTime.now().plusHours(2));
         waitingBookingForItem2.setItem(item2);
         waitingBookingForItem2.setBooker(user2);
         waitingBookingForItem2.setStatus(Status.WAITING);
-        //time = time.plusSeconds(4);
-        //Thread.sleep(50);
 
-        time = time.plusSeconds(10);
+        Thread.sleep(50);
 
         rejectedBookingForItem1 = new Booking();
-        rejectedBookingForItem1.setStart(time.plusHours(1));
-        rejectedBookingForItem1.setEnd(time.plusHours(2));
+        rejectedBookingForItem1.setStart(LocalDateTime.now().plusHours(1));
+        rejectedBookingForItem1.setEnd(LocalDateTime.now().plusHours(2));
         rejectedBookingForItem1.setItem(item1);
         rejectedBookingForItem1.setBooker(user2);
         rejectedBookingForItem1.setStatus(Status.REJECTED);
 
-        time = time.plusSeconds(10);
+        Thread.sleep(50);
 
         rejectedBookingForItem2 = new Booking();
-        rejectedBookingForItem2.setStart(time.plusHours(1));
-        rejectedBookingForItem2.setEnd(time.plusHours(2));
+        rejectedBookingForItem2.setStart(LocalDateTime.now().plusHours(1));
+        rejectedBookingForItem2.setEnd(LocalDateTime.now().plusHours(2));
         rejectedBookingForItem2.setItem(item2);
         rejectedBookingForItem2.setBooker(user2);
         rejectedBookingForItem2.setStatus(Status.REJECTED);
-
     }
 
     @SneakyThrows
