@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -114,6 +115,25 @@ public class ItemRepositoryTest {
         entityManager.flush();
         List<Item> expect = Collections.emptyList();
         List<Item> actual = items.findAllByNameOrDescriptionContainingIgnoreCaseAndAvailableTrue(PageRequest.of(0, 10), "test", "item test description");
+        Assertions.assertEquals(expect, actual);
+    }
+
+    @Test
+    public void testFindAllByOwnerId() {
+        entityManager.persist(item1);
+        entityManager.persist(item2);
+        entityManager.flush();
+        List<Item> expect = List.of(item1,item2);
+        List<Item> actual = items.findAllByOwnerId(PageRequest.of(0, 10), user1.getId());
+        Assertions.assertEquals(expect, actual);
+    }
+    @Test
+    public void testFindAllByNotOwnerId() {
+        entityManager.persist(item1);
+        entityManager.persist(item2);
+        entityManager.flush();
+        List<Item> expect = List.of();
+        List<Item> actual = items.findAllByOwnerId(PageRequest.of(0, 10), user2.getId());
         Assertions.assertEquals(expect, actual);
     }
 }
