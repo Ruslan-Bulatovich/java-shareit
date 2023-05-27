@@ -334,7 +334,7 @@ public class BookingServiceIntegrationTest {
         var findBookingList = bookingService
                 .getAllBookingsForUser(PageRequest.of(0, 10), user2.getId(), "PAST");
         assertThat(findBookingList.getBookings().size()).isEqualTo(2); //6
-        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).collect(Collectors.toList());
+        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).sorted().collect(Collectors.toList());
         assertThat(ids).first().isEqualTo(pastBookingForItem1.getId());
         assertThat(ids).last().isEqualTo(pastBookingForItem2.getId());
     }
