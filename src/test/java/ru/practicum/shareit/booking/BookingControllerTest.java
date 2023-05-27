@@ -45,7 +45,7 @@ public class BookingControllerTest {
     private BookingDtoResponse.UserData userData;
     private BookingListDto bookingListDto;
     private BookingDtoResponse bookingDtoResponse;
-    private final String userIdHeader = "X-Sharer-User-Id";
+    private static final String userIdHeader = "X-Sharer-User-Id";
 
     @BeforeEach
     public void setUp() {

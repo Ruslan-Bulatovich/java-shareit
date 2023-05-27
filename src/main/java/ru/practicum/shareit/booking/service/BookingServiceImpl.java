@@ -212,7 +212,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private boolean isNotValidDate(LocalDateTime startBooking, LocalDateTime endBooking) {
-        return startBooking.isBefore(LocalDateTime.now()) || endBooking.isBefore(LocalDateTime.now())
-                || endBooking.isBefore(startBooking) || endBooking.isEqual(startBooking);
+        return endBooking.isBefore(startBooking) || endBooking.isEqual(startBooking);
     }
 }

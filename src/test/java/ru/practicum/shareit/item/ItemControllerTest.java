@@ -35,7 +35,7 @@ public class ItemControllerTest {
     private ItemDto item1;
     private ItemDtoResponse itemDtoResponse;
     private ItemDtoUpdate itemDtoUpdate;
-    private final String userIdHeader = "X-Sharer-User-Id";
+    private static final String userIdHeader = "X-Sharer-User-Id";
 
     @BeforeEach
     public void setUp() {

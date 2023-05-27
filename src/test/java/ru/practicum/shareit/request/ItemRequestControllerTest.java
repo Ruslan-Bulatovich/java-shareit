@@ -39,7 +39,7 @@ public class ItemRequestControllerTest {
     private ItemRequestListDto itemRequestListDto;
     private RequestDtoResponseWithMD requestDtoResponseWithMD;
     private ItemDataForRequestDto itemDataForRequestDto;
-    private final String userIdHeader = "X-Sharer-User-Id";
+    private static final String userIdHeader = "X-Sharer-User-Id";
 
     @BeforeEach
     public void setUp() {

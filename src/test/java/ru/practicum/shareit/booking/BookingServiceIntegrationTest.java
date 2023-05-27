@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ActiveProfiles("test")
 @Sql(scripts = {"file:src/main/resources/schema.sql"})
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class BookingServiceTest {
+public class BookingServiceIntegrationTest {
     private final BookingService bookingService;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
@@ -254,19 +254,18 @@ public class BookingServiceTest {
         addBookingsInDb();
         var findBookingList = bookingService
                 .getAllBookingsForUser(PageRequest.of(0, 10), user2.getId(), "ALL");
-
+        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).sorted().collect(Collectors.toList());
         assertThat(findBookingList.getBookings().size()).isEqualTo(10);
-        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).collect(Collectors.toList());
-        assertThat(ids).first().isEqualTo(futureBookingForItem2.getId());
-        assertThat(ids).element(1).isEqualTo(futureBookingForItem1.getId());
-        assertThat(ids).element(2).isEqualTo(rejectedBookingForItem2.getId());
-        assertThat(ids).element(3).isEqualTo(rejectedBookingForItem1.getId());
-        assertThat(ids).element(4).isEqualTo(waitingBookingForItem2.getId());
-        assertThat(ids).element(5).isEqualTo(waitingBookingForItem1.getId());
-        assertThat(ids).element(6).isEqualTo(currentBookingForItem2.getId());
-        assertThat(ids).element(7).isEqualTo(currentBookingForItem1.getId());
-        assertThat(ids).element(9).isEqualTo(pastBookingForItem1.getId());
-        assertThat(ids).element(8).isEqualTo(pastBookingForItem2.getId());
+        assertThat(ids).first().isEqualTo(pastBookingForItem1.getId());
+        assertThat(ids).element(1).isEqualTo(pastBookingForItem2.getId());
+        assertThat(ids).element(2).isEqualTo(currentBookingForItem1.getId());
+        assertThat(ids).element(3).isEqualTo(currentBookingForItem2.getId());
+        assertThat(ids).element(4).isEqualTo(futureBookingForItem1.getId());
+        assertThat(ids).element(5).isEqualTo(futureBookingForItem2.getId());
+        assertThat(ids).element(6).isEqualTo(waitingBookingForItem1.getId());
+        assertThat(ids).element(7).isEqualTo(waitingBookingForItem2.getId());
+        assertThat(ids).element(8).isEqualTo(rejectedBookingForItem1.getId());
+        assertThat(ids).element(9).isEqualTo(rejectedBookingForItem2.getId());
         assertThat(item1.equals(item2)).isFalse();
     }
 
@@ -282,13 +281,12 @@ public class BookingServiceTest {
                 .getAllBookingsForItemsUser(PageRequest.of(0, 10), user1.getId(), "ALL");
         //then
         assertThat(findBookingList.getBookings().size()).isEqualTo(5);
-        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId)
-                .collect(Collectors.toList());
-        assertThat(ids).first().isEqualTo(futureBookingForItem1.getId());
-        assertThat(ids).element(1).isEqualTo(rejectedBookingForItem1.getId());
-        assertThat(ids).element(2).isEqualTo(waitingBookingForItem1.getId());
-        assertThat(ids).element(3).isEqualTo(currentBookingForItem1.getId());
-        assertThat(ids).element(4).isEqualTo(pastBookingForItem1.getId());
+        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).sorted().collect(Collectors.toList());
+        assertThat(ids).first().isEqualTo(pastBookingForItem1.getId());
+        assertThat(ids).element(1).isEqualTo(currentBookingForItem1.getId());
+        assertThat(ids).element(2).isEqualTo(futureBookingForItem1.getId());
+        assertThat(ids).element(3).isEqualTo(waitingBookingForItem1.getId());
+        assertThat(ids).element(4).isEqualTo(rejectedBookingForItem1.getId());
     }
 
     @Test
@@ -302,9 +300,9 @@ public class BookingServiceTest {
         var findBookingList = bookingService
                 .getAllBookingsForUser(PageRequest.of(0, 10), user2.getId(), "CURRENT");
         assertThat(findBookingList.getBookings().size()).isEqualTo(2);
-        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).collect(Collectors.toList());
-        assertThat(ids).last().isEqualTo(currentBookingForItem1.getId());
-        assertThat(ids).first().isEqualTo(currentBookingForItem2.getId());
+        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).sorted().collect(Collectors.toList());
+        assertThat(ids).last().isEqualTo(currentBookingForItem2.getId());
+        assertThat(ids).first().isEqualTo(currentBookingForItem1.getId());
     }
 
     @Test
@@ -335,8 +333,8 @@ public class BookingServiceTest {
                 .getAllBookingsForUser(PageRequest.of(0, 10), user2.getId(), "PAST");
         assertThat(findBookingList.getBookings().size()).isEqualTo(2); //6
         List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).collect(Collectors.toList());
-        assertThat(ids).first().isEqualTo(pastBookingForItem2.getId());
-        assertThat(ids).last().isEqualTo(pastBookingForItem1.getId());
+        assertThat(ids).first().isEqualTo(pastBookingForItem1.getId());
+        assertThat(ids).last().isEqualTo(pastBookingForItem2.getId());
     }
 
     @Test
@@ -364,13 +362,13 @@ public class BookingServiceTest {
         var findBookingList = bookingService
                 .getAllBookingsForUser(PageRequest.of(0, 10), user2.getId(), "Future");
         assertThat(findBookingList.getBookings().size()).isEqualTo(6); //2
-        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).collect(Collectors.toList());
-        assertThat(ids).first().isEqualTo(futureBookingForItem2.getId());
-        assertThat(ids).element(1).isEqualTo(futureBookingForItem1.getId());
-        assertThat(ids).element(2).isEqualTo(rejectedBookingForItem2.getId());
-        assertThat(ids).element(3).isEqualTo(rejectedBookingForItem1.getId());
-        assertThat(ids).element(4).isEqualTo(waitingBookingForItem2.getId());
-        assertThat(ids).element(5).isEqualTo(waitingBookingForItem1.getId());
+        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).sorted().collect(Collectors.toList());
+        assertThat(ids).first().isEqualTo(futureBookingForItem1.getId());
+        assertThat(ids).element(1).isEqualTo(futureBookingForItem2.getId());
+        assertThat(ids).element(2).isEqualTo(waitingBookingForItem1.getId());
+        assertThat(ids).element(3).isEqualTo(waitingBookingForItem2.getId());
+        assertThat(ids).element(4).isEqualTo(rejectedBookingForItem1.getId());
+        assertThat(ids).element(5).isEqualTo(rejectedBookingForItem2.getId());
     }
 
     @Test
@@ -384,12 +382,11 @@ public class BookingServiceTest {
 
         var findBookingList = bookingService
                 .getAllBookingsForItemsUser(PageRequest.of(0, 10), user1.getId(), "Future");
-        //then
+        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).sorted().collect(Collectors.toList());
         assertThat(findBookingList.getBookings().size()).isEqualTo(3);//1
-        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).collect(Collectors.toList());
         assertThat(ids).first().isEqualTo(futureBookingForItem1.getId());
-        assertThat(ids).element(1).isEqualTo(rejectedBookingForItem1.getId());
-        assertThat(ids).element(2).isEqualTo(waitingBookingForItem1.getId());
+        assertThat(ids).element(1).isEqualTo(waitingBookingForItem1.getId());
+        assertThat(ids).element(2).isEqualTo(rejectedBookingForItem1.getId());
     }
 
     @Test
@@ -402,11 +399,10 @@ public class BookingServiceTest {
         addBookingsInDb();
         var findBookingList = bookingService
                 .getAllBookingsForUser(PageRequest.of(0, 10), user2.getId(), "waiting");
-
+        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).sorted().collect(Collectors.toList());
         assertThat(findBookingList.getBookings().size()).isEqualTo(2);
-        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).collect(Collectors.toList());
-        assertThat(ids).first().isEqualTo(waitingBookingForItem2.getId());
-        assertThat(ids).last().isEqualTo(waitingBookingForItem1.getId());
+        assertThat(ids).first().isEqualTo(waitingBookingForItem1.getId());
+        assertThat(ids).last().isEqualTo(waitingBookingForItem2.getId());
     }
 
     @Test
@@ -434,11 +430,10 @@ public class BookingServiceTest {
         addBookingsInDb();
         var findBookingList = bookingService
                 .getAllBookingsForUser(PageRequest.of(0, 10), user2.getId(), "rejected");
-        //then
+        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).sorted().collect(Collectors.toList());
         assertThat(findBookingList.getBookings().size()).isEqualTo(2);
-        List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).collect(Collectors.toList());
-        assertThat(ids).first().isEqualTo(rejectedBookingForItem2.getId());
-        assertThat(ids).last().isEqualTo(rejectedBookingForItem1.getId());
+        assertThat(ids).first().isEqualTo(rejectedBookingForItem1.getId());
+        assertThat(ids).last().isEqualTo(rejectedBookingForItem2.getId());
     }
 
     @Test
@@ -502,16 +497,12 @@ public class BookingServiceTest {
         currentBookingForItem1.setBooker(user2);
         currentBookingForItem1.setStatus(Status.APPROVED);
 
-        Thread.sleep(50);
-
         currentBookingForItem2 = new Booking();
         currentBookingForItem2.setStart(LocalDateTime.now().minusDays(1));
         currentBookingForItem2.setEnd(LocalDateTime.now().plusDays(1));
         currentBookingForItem2.setItem(item2);
         currentBookingForItem2.setBooker(user2);
         currentBookingForItem2.setStatus(Status.APPROVED);
-
-        Thread.sleep(50);
 
         pastBookingForItem1 = new Booking();
         pastBookingForItem1.setStart(LocalDateTime.now().minusDays(2));
@@ -520,16 +511,12 @@ public class BookingServiceTest {
         pastBookingForItem1.setBooker(user2);
         pastBookingForItem1.setStatus(Status.APPROVED);
 
-        Thread.sleep(50);
-
         pastBookingForItem2 = new Booking();
         pastBookingForItem2.setStart(LocalDateTime.now().minusDays(2));
         pastBookingForItem2.setEnd(LocalDateTime.now().minusDays(1));
         pastBookingForItem2.setItem(item2);
         pastBookingForItem2.setBooker(user2);
         pastBookingForItem2.setStatus(Status.APPROVED);
-
-        Thread.sleep(50);
 
         futureBookingForItem1 = new Booking();
         futureBookingForItem1.setStart(LocalDateTime.now().plusDays(1));
@@ -538,16 +525,12 @@ public class BookingServiceTest {
         futureBookingForItem1.setBooker(user2);
         futureBookingForItem1.setStatus(Status.APPROVED);
 
-        Thread.sleep(50);
-
         futureBookingForItem2 = new Booking();
         futureBookingForItem2.setStart(LocalDateTime.now().plusDays(1));
         futureBookingForItem2.setEnd(LocalDateTime.now().plusDays(2));
         futureBookingForItem2.setItem(item2);
         futureBookingForItem2.setBooker(user2);
         futureBookingForItem2.setStatus(Status.APPROVED);
-
-        Thread.sleep(50);
 
         waitingBookingForItem1 = new Booking();
         waitingBookingForItem1.setStart(LocalDateTime.now().plusHours(1));
@@ -556,8 +539,6 @@ public class BookingServiceTest {
         waitingBookingForItem1.setBooker(user2);
         waitingBookingForItem1.setStatus(Status.WAITING);
 
-        Thread.sleep(50);
-
         waitingBookingForItem2 = new Booking();
         waitingBookingForItem2.setStart(LocalDateTime.now().plusHours(1));
         waitingBookingForItem2.setEnd(LocalDateTime.now().plusHours(2));
@@ -565,16 +546,12 @@ public class BookingServiceTest {
         waitingBookingForItem2.setBooker(user2);
         waitingBookingForItem2.setStatus(Status.WAITING);
 
-        Thread.sleep(50);
-
         rejectedBookingForItem1 = new Booking();
         rejectedBookingForItem1.setStart(LocalDateTime.now().plusHours(1));
         rejectedBookingForItem1.setEnd(LocalDateTime.now().plusHours(2));
         rejectedBookingForItem1.setItem(item1);
         rejectedBookingForItem1.setBooker(user2);
         rejectedBookingForItem1.setStatus(Status.REJECTED);
-
-        Thread.sleep(50);
 
         rejectedBookingForItem2 = new Booking();
         rejectedBookingForItem2.setStart(LocalDateTime.now().plusHours(1));
