@@ -1,57 +1,71 @@
 package ru.practicum.shareit.item.controller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
-import java.util.List;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/items")
-@AllArgsConstructor
+@Validated
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemController {
     private final ItemService itemService;
-    private final String userIdHeader = "X-Sharer-User-Id";
+    private static final String userIdHeader = "X-Sharer-User-Id";
 
-    @PostMapping()
-    public ResponseEntity<ItemDto> addItem(@RequestHeader(userIdHeader) long userId, @Valid @RequestBody ItemDto itemDto) {
-        return ResponseEntity.status(201).body(itemService.addItem(userId, itemDto));
-    }
-
-    @GetMapping("{itemId}")
-    public ResponseEntity<ItemDto> getItem(@PathVariable long itemId, @RequestHeader(userIdHeader) long userId) {
-        return ResponseEntity.ok().body(itemService.getItemById(itemId, userId));
-    }
-
-    @GetMapping()
-    public ResponseEntity<List<ItemDto>> getAllItems(@RequestHeader(userIdHeader) long userId) {
-        return ResponseEntity.ok().body(itemService.getAllItems(userId));
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> searchItems(@RequestParam String text) {
-        return ResponseEntity.ok().body(itemService.searchItems(text));
+    @PostMapping
+    public ResponseEntity<ItemDtoResponse> createItem(@RequestHeader(userIdHeader) @Min(1) Long userId,
+                                                      @Valid @RequestBody ItemDto itemDto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(itemService.createItem(itemDto, userId));
     }
 
     @PatchMapping("{itemId}")
-    public ResponseEntity<ItemDto> updateItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId, @RequestBody ItemDto itemDto) {
-        return ResponseEntity.ok().body(itemService.updateItem(userId, itemId, itemDto));
+    public ResponseEntity<ItemDtoResponse> updateItem(@RequestHeader(userIdHeader) @Min(1) Long userId,
+                                                      @RequestBody ItemDtoUpdate itemDtoUpdate,
+                                                      @PathVariable @Min(1) Long itemId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(itemService.updateItem(itemId, userId, itemDtoUpdate));
     }
 
-    @DeleteMapping("{itemId}")
-    public ResponseEntity<Void> removeItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId) {
-        itemService.removeItem(userId, itemId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @GetMapping("{itemId}")
+    public ResponseEntity<ItemDtoResponse> getItemByItemId(@RequestHeader(userIdHeader) @Min(1) Long userId,
+                                                           @PathVariable @Min(1) Long itemId) {
+        return ResponseEntity.status(HttpStatus.OK).body(itemService.getItemByItemId(userId, itemId));
     }
 
-    @PostMapping("/{itemId}/comment")
-    public ResponseEntity<CommentDto> addComment(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId,
-                                                 @RequestBody @Valid CommentDto commentDto) {
-        return ResponseEntity.ok().body(itemService.addComment(userId, itemId, commentDto));
+    @GetMapping
+    public ResponseEntity<ItemListDto> getPersonalItems(
+            @RequestHeader(userIdHeader) @Min(1) Long userId,
+            @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
+            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(itemService.getPersonalItems(PageRequest.of(from / size, size), userId));
     }
+
+    @GetMapping("search")
+    public ResponseEntity<ItemListDto> getFoundItems(
+            @RequestParam String text,
+            @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
+            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(itemService.getFoundItems(PageRequest.of(from / size, size), text));
+    }
+
+    @PostMapping("{itemId}/comment")
+    public ResponseEntity<CommentDtoResponse> addComment(@PathVariable @Min(1) Long itemId,
+                                                         @RequestHeader(userIdHeader) @Min(1) Long userId,
+                                                         @Valid @RequestBody CommentDto commentDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(itemService.addComment(itemId, userId, commentDto));
+    }
+
 }
