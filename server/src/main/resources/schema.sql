@@ -37,10 +37,7 @@ CREATE TABLE IF NOT EXISTS bookings
     end_date   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     item_id    BIGINT REFERENCES items (item_id) ON DELETE RESTRICT,
     booker_id  BIGINT REFERENCES users (user_id) ON DELETE RESTRICT,
-    status     enum ('WAITING',
-        'APPROVED',
-        'REJECTED',
-        'CANCELED')
+    status     varchar (100)
 );
 
 CREATE TABLE IF NOT EXISTS comments

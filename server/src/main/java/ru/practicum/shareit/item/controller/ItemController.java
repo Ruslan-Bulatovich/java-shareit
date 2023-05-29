@@ -11,7 +11,6 @@ import ru.practicum.shareit.item.service.ItemService;
 
 @RestController
 @RequestMapping("/items")
-
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemController {
     private final ItemService itemService;

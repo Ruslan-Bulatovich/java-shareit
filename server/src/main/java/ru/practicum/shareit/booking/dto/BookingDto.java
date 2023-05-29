@@ -9,8 +9,11 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class BookingDto {
+
     private LocalDateTime start;
+
     private LocalDateTime end;
+
     private Long itemId;
     private final Status status = Status.WAITING;
 }
