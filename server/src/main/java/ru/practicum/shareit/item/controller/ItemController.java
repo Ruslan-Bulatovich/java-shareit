@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,7 @@ public class ItemController {
             @RequestParam(value = "from", defaultValue = "0") Integer from,
             @RequestParam(value = "size", defaultValue = "10") Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(itemService.getPersonalItems(PageRequest.of(from / size, size), userId));
+                .body(itemService.getPersonalItems(PageRequest.of(from / size, size, Sort.by(Sort.Direction.ASC, "id")), userId));
     }
 
     @GetMapping("search")
