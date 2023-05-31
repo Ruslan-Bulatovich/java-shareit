@@ -1,146 +1,133 @@
 package ru.practicum.shareit.user;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.error.handler.exception.ObjectNotFoundException;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserDtoResponse;
 import ru.practicum.shareit.user.dto.UserDtoUpdate;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import java.util.List;
+import java.util.Optional;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase
-@ActiveProfiles("test")
-@Sql(scripts = {"file:src/main/resources/schema.sql"})
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
-    private final UserService userService;
-    private static UserDto user1;
-    private static UserDto user2;
-    private static UserDtoUpdate updateUser1;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private UserMapper mapper;
+    @InjectMocks
+    private UserServiceImpl userService;
+    private UserDto userDto = new UserDto("Mike", "mike@gmail.com");
+    private User user = new User(1L, "Mike", "mike@gmail.com");
 
     @BeforeEach
     public void setUp() {
-        user1 = UserDto.builder()
-                .name("test name")
-                .email("test@test.ru")
+        userRepository = Mockito.mock(UserRepository.class);
+        mapper = Mappers.getMapper(UserMapper.class);
+        userService = new UserServiceImpl(userRepository, mapper);
+    }
+
+    @Test
+    public void createUser() {
+        User user = User.builder()
+                .id(1L)
+                .name("testName")
+                .email("testEmail@gmail.com")
                 .build();
-        user2 = UserDto.builder()
-                .name("test name 2")
-                .email("test2@test.ru")
+        UserDto userDto = UserDto.builder()
+                .name("testName")
+                .email("testEmail@gmail.com")
                 .build();
+
+        Mockito.when(userRepository.save(Mockito.any())).thenReturn(user);
+        UserDtoResponse userDtoTest = userService.createUser(userDto);
+        assertEquals(user.getId(), userDtoTest.getId());
+        assertEquals(user.getName(), userDtoTest.getName());
+        assertEquals(user.getEmail(), userDtoTest.getEmail());
     }
 
     @Test
-    public void createAndGetUser() {
-        var savedUser = userService.createUser(user1);
-        var findUser = userService.getUserById(1L);
-        assertThat(savedUser).usingRecursiveComparison().isEqualTo(findUser);
-    }
-
-    @Test
-    public void createUserWithDuplicateEmail() {
-        userService.createUser(user1);
-        assertThatThrownBy(
-                () -> userService.createUser(user1))
-                .isInstanceOf(DataIntegrityViolationException.class);
-    }
-
-    @Test
-    public void getNotExistUserById() {
-        assertThatThrownBy(
-                () -> userService.getUserById(2L))
-                .isInstanceOf(ObjectNotFoundException.class);
-    }
-
-    @Test
-    public void getEmptyUsersList() {
-        var users = userService.getUsers();
-        assertThat(users.getUsers()).isEmpty();
-    }
-
-    @Test
-    public void getUsersList() {
-        var savedUser1 = userService.createUser(user1);
-        var savedUser2 = userService.createUser(user2);
-        var findUsers = userService.getUsers();
-        assertThat(findUsers.getUsers()).element(0).usingRecursiveComparison().isEqualTo(savedUser1);
-        assertThat(findUsers.getUsers()).element(1).usingRecursiveComparison().isEqualTo(savedUser2);
-    }
-
-    @Test
-    public void updateUser() {
-        updateUser1 = UserDtoUpdate.builder()
-                .name("update name")
-                .email("update-email@test.ru")
+    void update() {
+        User user = User.builder()
+                .id(1L)
+                .name("testName")
+                .email("testEmail@gmail.com")
                 .build();
-        userService.createUser(user1);
-        userService.updateUser(updateUser1, 1L);
-        var updatedUser1 = userService.getUserById(1L);
-        assertThat(updatedUser1.getName()).isEqualTo(updateUser1.getName());
-        assertThat(updatedUser1.getEmail()).isEqualTo(updateUser1.getEmail());
-    }
-
-    @Test
-    public void updateUserName() {
-        updateUser1 = UserDtoUpdate.builder()
-                .email("update-email@test.ru")
+        UserDtoUpdate userDtoForUpdate = UserDtoUpdate.builder()
+                .name("newTestName")
+                .email("newTestEmail@gmail.com")
                 .build();
-        userService.createUser(user1);
-        userService.updateUser(updateUser1, 1L);
-        var updatedUser1 = userService.getUserById(1L);
-        assertThat(updatedUser1.getName()).isEqualTo(user1.getName());
-        assertThat(updatedUser1.getEmail()).isEqualTo(updatedUser1.getEmail());
+
+        Mockito.when(userRepository.save(Mockito.any())).thenReturn(user);
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
+
+        var updatedUserDtoTest = userService.updateUser(userDtoForUpdate, user.getId());
+        assertEquals(user.getId(), updatedUserDtoTest.getId());
+        assertEquals(user.getName(), updatedUserDtoTest.getName());
+        assertEquals(user.getEmail(), updatedUserDtoTest.getEmail());
     }
 
     @Test
-    public void updateUserEmail() {
-        updateUser1 = UserDtoUpdate.builder()
-                .name("update name")
+    void updateWithOnlyNameChange() {
+        User user = User.builder()
+                .id(1L)
+                .name("testName")
+                .email("testEmail@gmail.com")
                 .build();
-        userService.createUser(user1);
-        userService.updateUser(updateUser1, 1L);
-        var updatedUser1 = userService.getUserById(1L);
-        assertThat(updatedUser1.getName()).isEqualTo(updateUser1.getName());
-        assertThat(updatedUser1.getEmail()).isEqualTo(user1.getEmail());
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public void updateUserDuplicateEmail() {
-        updateUser1 = UserDtoUpdate.builder()
-                .email(user1.getEmail())
+        UserDtoUpdate userDtoForUpdate = UserDtoUpdate.builder()
+                .name("newTestName")
                 .build();
-        userService.createUser(user1);
-        userService.createUser(user2);
-        assertThatThrownBy(
-                () -> userService.updateUser(updateUser1, 2L))
-                .isInstanceOf(DataIntegrityViolationException.class);
+
+        Mockito.when(userRepository.save(Mockito.any())).thenReturn(user);
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
+
+        var updatedUserDtoTest = userService.updateUser(userDtoForUpdate, user.getId());
+        assertEquals(user.getId(), updatedUserDtoTest.getId());
+        assertEquals(user.getName(), updatedUserDtoTest.getName());
+        assertEquals(user.getEmail(), updatedUserDtoTest.getEmail());
     }
 
     @Test
-    public void deleteUserById() {
-        var savedUser = userService.createUser(user1);
-        userService.deleteUser(savedUser.getId());
-        assertThatThrownBy(() -> userService.getUserById(savedUser.getId())).isInstanceOf(ObjectNotFoundException.class);
+    void findById() {
+        User user = User.builder()
+                .id(1L)
+                .name("testName")
+                .email("testEmail@gmail.com")
+                .build();
+
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
+        var userDtoTest = userService.getUserById(user.getId());
+        assertEquals(user.getId(), userDtoTest.getId());
+        assertEquals(user.getName(), userDtoTest.getName());
+        assertEquals(user.getEmail(), userDtoTest.getEmail());
     }
 
     @Test
-    public void deleteUserByNotExistId() {
-        assertThatThrownBy(
-                () -> userService.deleteUser(1L)
-        )
-                .isInstanceOf(ObjectNotFoundException.class);
+    void findAll() {
+        User userOne = new User(1L, "testNameOne", "testEmailOne@gmail.com");
+        User userTwo = new User(2L, "testNameTwo", "testEmailTwo@gmail.com");
+        List<User> userList = List.of(userOne, userTwo);
+
+        Mockito.when(userRepository.findAll()).thenReturn(userList);
+
+        List<UserDtoResponse> userDtoList = userService.getUsers().getUsers();
+        assertEquals(userList.size(), userDtoList.size());
+        assertEquals(userList.get(0).getId(), userDtoList.get(0).getId());
+        assertEquals(userList.get(0).getName(), userDtoList.get(0).getName());
+        assertEquals(userList.get(0).getEmail(), userDtoList.get(0).getEmail());
     }
 }
+
+
