@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -12,6 +10,9 @@ import java.time.LocalDateTime;
 @Setter
 @EqualsAndHashCode
 @Entity
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "comments")
 public class Comment {
     @Id

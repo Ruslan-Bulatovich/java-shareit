@@ -29,8 +29,8 @@ public class UserServiceTest {
     private UserMapper mapper;
     @InjectMocks
     private UserServiceImpl userService;
-    private UserDto userDto = new UserDto("Mike", "mike@gmail.com");
-    private User user = new User(1L, "Mike", "mike@gmail.com");
+    private final UserDto userDto = new UserDto("Mike", "mike@gmail.com");
+    private final User user = new User(1L, "Mike", "mike@gmail.com");
 
     @BeforeEach
     public void setUp() {
