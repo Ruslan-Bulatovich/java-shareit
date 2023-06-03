@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.error.handler.responce.StateErrorResponse;
 
-import javax.validation.ConstraintViolationException;
 import java.util.Objects;
 
 @RestControllerAdvice
@@ -60,10 +59,4 @@ public class ErrorHandler {
                 .body(new StateErrorResponse(exception.getMessage()));
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    private ResponseEntity<String> handleException(ConstraintViolationException exception) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(HttpStatus.BAD_REQUEST + " " + exception.getMessage());
-    }
 }
