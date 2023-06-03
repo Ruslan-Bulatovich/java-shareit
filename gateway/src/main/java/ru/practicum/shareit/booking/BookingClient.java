@@ -12,6 +12,7 @@ import ru.practicum.shareit.booking.dto.State;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.handler.exception.StateException;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
@@ -29,6 +30,7 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> createBooking(Long bookerId, BookingDto bookingDto) {
+        isNotValidDate(bookingDto.getStart(), bookingDto.getEnd());
         return post("", bookerId, bookingDto);
     }
 
@@ -68,6 +70,12 @@ public class BookingClient extends BaseClient {
     private void validateState(String state) {
         if (State.fromValue(state).equals(State.UNSUPPORTED_STATUS)) {
             throw new StateException("Unknown state: " + state);
+        }
+    }
+
+    private void isNotValidDate(LocalDateTime startBooking, LocalDateTime endBooking) {
+        if (endBooking.isBefore(startBooking) || endBooking.isEqual(startBooking)) {
+            throw new StateException("The end date of the booking cannot be earlier than the start date");
         }
     }
 }

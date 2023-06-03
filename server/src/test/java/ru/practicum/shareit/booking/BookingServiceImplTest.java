@@ -94,18 +94,6 @@ public class BookingServiceImplTest {
     }
 
     @Test
-    public void createBookingWhenEndBeforeStart() {
-        UserDtoResponse createdOwner = userService.createUser(testUser);
-        UserDtoResponse createdBooker = userService.createUser(testUser2);
-        ItemDtoResponse item = itemService.createItem(testItem, createdOwner.getId());
-        BookingDto bookingWrongTime = BookingDto.builder().itemId(1L).start(LocalDateTime.now())
-                .end(LocalDateTime.now().minusHours(2)).build();
-        assertThatThrownBy(
-                () -> bookingService.createBooking(createdBooker.getId(), bookingWrongTime)
-        ).isInstanceOf(InvalidDataException.class);
-    }
-
-    @Test
     public void createBookingWhenBookerIsOwner() {
         UserDtoResponse createdOwner = userService.createUser(testUser);
         UserDtoResponse createdBooker = userService.createUser(testUser2);

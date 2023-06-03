@@ -110,19 +110,6 @@ public class BookingServiceIntegrationTest {
     }
 
     @Test
-    public void createBookingWhenEndBeforeStart() {
-        //given
-        booking1Dto.setEnd(LocalDateTime.now().plusDays(1));
-        booking1Dto.setStart(LocalDateTime.now().plusDays(2));
-        userRepository.save(user1);
-        userRepository.save(user2);
-        itemRepository.save(item1);
-        assertThatThrownBy(
-                () -> bookingService.createBooking(user2.getId(), booking1Dto)
-        ).isInstanceOf(InvalidDataException.class);
-    }
-
-    @Test
     public void createBookingWhenBookerIsOwner() {
         userRepository.save(user1);
         userRepository.save(user2);

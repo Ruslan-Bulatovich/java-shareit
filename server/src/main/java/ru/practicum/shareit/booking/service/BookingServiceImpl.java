@@ -13,7 +13,6 @@ import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.error.handler.exception.InvalidDataException;
 import ru.practicum.shareit.error.handler.exception.ObjectNotAvailableException;
 import ru.practicum.shareit.error.handler.exception.ObjectNotFoundException;
 import ru.practicum.shareit.error.handler.exception.StateException;
@@ -37,9 +36,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDtoResponse createBooking(Long bookerId, BookingDto bookingDto) {
-        if (isNotValidDate(bookingDto.getStart(), bookingDto.getEnd())) {
-            throw new InvalidDataException("Дата окончания бронирования не может быть раньше даты начала");
-        }
         Item item = items.findById(bookingDto.getItemId()).orElseThrow(
                 () -> new ObjectNotFoundException(String.format("Предмета с id=%s нет", bookingDto.getItemId())));
         if (!item.getOwner().getId().equals(bookerId)) {
@@ -209,9 +205,5 @@ public class BookingServiceImpl implements BookingService {
             default:
                 throw new StateException("Unknown state: " + state);
         }
-    }
-
-    private boolean isNotValidDate(LocalDateTime startBooking, LocalDateTime endBooking) {
-        return endBooking.isBefore(startBooking) || endBooking.isEqual(startBooking);
     }
 }
