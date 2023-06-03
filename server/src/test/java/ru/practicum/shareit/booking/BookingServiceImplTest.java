@@ -14,7 +14,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.dto.BookingListDto;
 import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.error.handler.exception.InvalidDataException;
 import ru.practicum.shareit.error.handler.exception.ObjectNotAvailableException;
 import ru.practicum.shareit.error.handler.exception.ObjectNotFoundException;
 import ru.practicum.shareit.error.handler.exception.StateException;

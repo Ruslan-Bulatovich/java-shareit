@@ -17,7 +17,6 @@ import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.error.handler.exception.InvalidDataException;
 import ru.practicum.shareit.error.handler.exception.ObjectNotAvailableException;
 import ru.practicum.shareit.error.handler.exception.ObjectNotFoundException;
 import ru.practicum.shareit.error.handler.exception.StateException;
